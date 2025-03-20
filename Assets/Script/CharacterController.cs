@@ -53,16 +53,9 @@ public class CharacterController : MonoBehaviour
 
     private void CheckGround()
     {
-        Vector2 groundCheckPosition = new Vector2(
-            transform.position.x,
-            transform.position.y - 0.6f
-        );
-        isGrounded = Physics2D.Raycast(
-            groundCheckPosition,
-            Vector2.down,
-            groundCheckDistance,
-            groundLayer
-        );
+        Vector2 groundCheckPosition = new Vector2(transform.position.x,transform.position.y - 0.6f);
+
+        isGrounded = Physics2D.Raycast(groundCheckPosition,Vector2.down,groundCheckDistance,groundLayer);
 
         Debug.DrawRay(groundCheckPosition, Vector2.down * groundCheckDistance, Color.red);
     }
@@ -80,8 +73,7 @@ public class CharacterController : MonoBehaviour
         if (rb.velocity.y < 0)
             rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
         else if (rb.velocity.y > 0 && !Input.GetButton("Jump"))
-            rb.velocity +=
-                Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
+            rb.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
     }
 
     private void HandleMovement()
@@ -90,19 +82,9 @@ public class CharacterController : MonoBehaviour
         float controlFactor = isGrounded ? 1f : airControlFactor;
 
         if (moveInput != 0)
-            rb.velocity = new Vector2(
-                Mathf.Lerp(
-                    rb.velocity.x,
-                    moveInput * moveSpeed,
-                    acceleration * controlFactor * Time.deltaTime
-                ),
-                rb.velocity.y
-            );
+            rb.velocity = new Vector2(Mathf.Lerp(rb.velocity.x,moveInput * moveSpeed,acceleration * controlFactor * Time.deltaTime), rb.velocity.y);
         else
-            rb.velocity = new Vector2(
-                Mathf.Lerp(rb.velocity.x, 0, deceleration * Time.deltaTime),
-                rb.velocity.y
-            );
+            rb.velocity = new Vector2(Mathf.Lerp(rb.velocity.x, 0, deceleration * Time.deltaTime), rb.velocity.y);
     }
 
     private void FlipCharacter()
