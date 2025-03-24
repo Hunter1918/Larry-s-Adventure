@@ -11,6 +11,7 @@ public class PlatformEnemy : MonoBehaviour
     [Header("Patrouille")]
     public Transform platformStart;
     public Transform platformEnd;
+    private Vector3 destination;
     public float moveSpeed = 2f;
 
     [Header("Attaque")]
@@ -22,6 +23,11 @@ public class PlatformEnemy : MonoBehaviour
 
     private Transform targetPlayer;
 
+    void Start()
+    {
+        destination = platformStart.position;
+    }
+
     void Update()
     {
         Patrol();
@@ -32,24 +38,27 @@ public class PlatformEnemy : MonoBehaviour
         }
     }
 
-    // Déplacement d'un bord à l'autre
     void Patrol()
     {
-        float direction = faceRight ? 1f : -1f;
-        transform.Translate(Vector2.right * direction * moveSpeed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
 
-        // Si atteint le bord de la plateforme, on se retourne
-        if (faceRight && transform.position.x >= platformEnd.position.x)
+        if (Vector3.Distance(transform.position, destination) < 0.1f)
         {
-            Flip();
-        }
-        else if (!faceRight && transform.position.x <= platformStart.position.x)
-        {
-            Flip();
+            if (destination == platformStart.position)
+            {
+                destination = platformEnd.position;
+                Flip();
+            }
+            else
+            {
+                destination = platformStart.position;
+                Flip();
+            }
         }
     }
 
-    // Inverse la direction de déplacement
+
+
     void Flip()
     {
         faceRight = !faceRight;
@@ -58,7 +67,6 @@ public class PlatformEnemy : MonoBehaviour
         transform.localScale = localScale;
     }
 
-    // Vision par Raycast
     bool CanSeePlayer()
     {
         Vector2 direction = faceRight ? Vector2.right : Vector2.left;
@@ -78,7 +86,6 @@ public class PlatformEnemy : MonoBehaviour
         return false;
     }
 
-    // Action d'attaque (à personnaliser)
     void Attack()
     {
         Debug.Log($"{gameObject.name} attaque le joueur !");

@@ -147,7 +147,7 @@ Transform:
   m_GameObject: {fileID: 53475450}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.13, y: -0.72, z: -2.58}
+  m_LocalPosition: {x: 4.71, y: -0.17, z: -2.58}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -307,7 +307,7 @@ Transform:
   m_GameObject: {fileID: 288228468}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.88, y: -0.72, z: -2.58}
+  m_LocalPosition: {x: 13.25, y: -0.17, z: -2.58}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1327,7 +1327,7 @@ Transform:
   m_GameObject: {fileID: 1509172567}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.96, y: 1.2, z: -2.58}
+  m_LocalPosition: {x: 9.96, y: -0.17, z: -2.58}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1345,14 +1345,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f88a38b29f1868459e25a52e1b8cccc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerLayer:
+  playerLayer:
     serializedVersion: 2
     m_Bits: 64
-  visionrange: 5
+  visionRange: 0.5
   raycastOffset: {x: 0, y: 0.5}
   faceRight: 1
   platformStart: {fileID: 288228469}
   platformEnd: {fileID: 53475451}
+  moveSpeed: 2
   attackCooldown: 2
   showRaycast: 1
 --- !u!1 &1565584154
