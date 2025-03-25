@@ -1,6 +1,7 @@
 using UnityEngine;
+using System.Collections;
 
-public class PlatformEnemy : MonoBehaviour
+public class Enemy : MonoBehaviour
 {
     [Header("Détection du joueur")]
     public LayerMask playerLayer;
@@ -21,22 +22,78 @@ public class PlatformEnemy : MonoBehaviour
     [Header("Debug")]
     public bool showRaycast = true;
 
+    [Header("Vie du Slime")]
+    [SerializeField] private int health = 100;
+
+    [Header("Effet de recul")]
+    public float knockbackForce = 5f;
+
     private Transform targetPlayer;
+    private SpriteRenderer spriteRenderer;
+    private Rigidbody2D rb;
+    private bool canMove = true;
+
 
     void Start()
     {
         destination = platformStart.position;
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
-        Patrol();
+        if (canMove)
+            Patrol();
 
         if (CanSeePlayer() && Time.time > lastAttackTime + attackCooldown)
         {
             Attack();
         }
     }
+
+
+    public void Damage(int amount)
+    {
+        health -= amount;
+        Debug.Log($"{gameObject.name} a pris {amount} dégâts. Vie restante : {health}");
+
+        Vector2 knockDirection = ((Vector2)transform.position - PlayerPosition()).normalized;
+        rb.AddForce(knockDirection * knockbackForce, ForceMode2D.Impulse);
+
+        StartCoroutine(FlashSprite());
+        StartCoroutine(DisableMovement(0.5f));
+
+
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        Debug.Log($"{gameObject.name} est mort !");
+        Destroy(gameObject);
+    }
+
+    IEnumerator FlashSprite()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            spriteRenderer.color = new Color(1, 1, 1, 0.3f);
+            yield return new WaitForSeconds(0.1f);
+            spriteRenderer.color = Color.red;
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+    IEnumerator DisableMovement(float duration)
+    {
+        canMove = false;
+        yield return new WaitForSeconds(duration);
+        canMove = true;
+    }
+
 
     void Patrol()
     {
@@ -56,8 +113,6 @@ public class PlatformEnemy : MonoBehaviour
             }
         }
     }
-
-
 
     void Flip()
     {
@@ -90,5 +145,13 @@ public class PlatformEnemy : MonoBehaviour
     {
         Debug.Log($"{gameObject.name} attaque le joueur !");
         lastAttackTime = Time.time;
+    }
+
+    Vector2 PlayerPosition()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+            return player.transform.position;
+        return transform.position;
     }
 }

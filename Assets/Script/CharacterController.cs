@@ -29,9 +29,11 @@ public class CharacterController : MonoBehaviour
     [Header("Physique aérienne")]
     [SerializeField]
     private float fallMultiplier = 2.5f;
-
     [SerializeField]
     private float lowJumpMultiplier = 2f;
+
+    [Header("Son")]
+    public AudioSource JumpAudio;
 
     [SerializeField]
     private float airControlFactor = 0.5f;
@@ -40,6 +42,7 @@ public class CharacterController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        JumpAudio = rb.GetComponent<AudioSource>();
     }
 
     void Update()
@@ -64,6 +67,7 @@ public class CharacterController : MonoBehaviour
     {
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
+            JumpAudio.Play();
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
     }
