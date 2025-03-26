@@ -43,6 +43,7 @@ public class CharacterController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         JumpAudio = rb.GetComponent<AudioSource>();
+        JumpAudio.Stop();
     }
 
     void Update()
@@ -56,12 +57,18 @@ public class CharacterController : MonoBehaviour
 
     private void CheckGround()
     {
-        Vector2 groundCheckPosition = new Vector2(transform.position.x,transform.position.y - 0.6f);
+        Vector2 leftRayOrigin = new Vector2(transform.position.x - 0.57f, transform.position.y - 0.6f);
+        Vector2 rightRayOrigin = new Vector2(transform.position.x + 0.57f, transform.position.y - 0.6f);
 
-        isGrounded = Physics2D.Raycast(groundCheckPosition,Vector2.down,groundCheckDistance,groundLayer);
+        RaycastHit2D leftHit = Physics2D.Raycast(leftRayOrigin, Vector2.down, groundCheckDistance, groundLayer);
+        RaycastHit2D rightHit = Physics2D.Raycast(rightRayOrigin, Vector2.down, groundCheckDistance, groundLayer);
 
-        Debug.DrawRay(groundCheckPosition, Vector2.down * groundCheckDistance, Color.red);
+        Debug.DrawRay(leftRayOrigin, Vector2.down * groundCheckDistance, Color.red);
+        Debug.DrawRay(rightRayOrigin, Vector2.down * groundCheckDistance, Color.blue);
+
+        isGrounded = leftHit.collider != null || rightHit.collider != null;
     }
+
 
     private void Jump()
     {
