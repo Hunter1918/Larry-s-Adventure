@@ -1855,7 +1855,11 @@ MonoBehaviour:
     m_Bits: 8
   fallMultiplier: 3
   lowJumpMultiplier: 5
-  JumpAudio: {fileID: 2020468557}
+  MashUp:
+  - {fileID: 8300000, guid: 6ff1a04dcd6c2484d858014ce6420b82, type: 3}
+  - {fileID: 8300000, guid: cfb48fd03b05be1488f396b9c9ddfd31, type: 3}
+  - {fileID: 8300000, guid: 0bf2fd262413b434fb7c9ef068303f81, type: 3}
+  JeSaute: {fileID: 2020468557}
   airControlFactor: 0.5
 --- !u!114 &2020468556
 MonoBehaviour:
@@ -1880,9 +1884,9 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 6b47b965b7f125841a32e75d29ce24c0, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 0bf2fd262413b434fb7c9ef068303f81, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.2
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 0

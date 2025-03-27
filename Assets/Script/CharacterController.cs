@@ -33,7 +33,8 @@ public class CharacterController : MonoBehaviour
     private float lowJumpMultiplier = 2f;
 
     [Header("Son")]
-    public AudioSource JumpAudio;
+    public AudioClip[] MashUp;
+    public AudioSource JeSaute;
 
     [SerializeField]
     private float airControlFactor = 0.5f;
@@ -42,8 +43,6 @@ public class CharacterController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        JumpAudio = rb.GetComponent<AudioSource>();
-        JumpAudio.Stop();
     }
 
     void Update()
@@ -72,9 +71,10 @@ public class CharacterController : MonoBehaviour
 
     private void Jump()
     {
+        int index = Random.Range(0,MashUp.Length);
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            JumpAudio.Play();
+            JeSaute.PlayOneShot(MashUp[index]);
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
     }
@@ -109,10 +109,9 @@ public class CharacterController : MonoBehaviour
     private void Flip()
     {
         facingRight = !facingRight;
-        transform.localScale = new Vector3(
+        transform.localScale = new Vector2(
             -transform.localScale.x,
-            transform.localScale.y,
-            transform.localScale.z
+            transform.localScale.y
         );
     }
 }
