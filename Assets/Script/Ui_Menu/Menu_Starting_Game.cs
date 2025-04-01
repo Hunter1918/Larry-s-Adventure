@@ -23,6 +23,8 @@ public class Menu_Starting_Game : MonoBehaviour
         SceneManager.LoadScene(gameSceneName);
     }
 
+    public void QuitSettingMenu()
+    { Settings.SetActive(false); }
     public void Quit()
     {
         Application.Quit();
