@@ -53,33 +53,32 @@ public class BossController : MonoBehaviour
     {
         isAttacking = true;
 
-        // Phase d'anticipation
         Debug.Log("Boss prépare une attaque de mêlée...");
-        yield return new WaitForSeconds(0.5f); // anticiper, animation
+        yield return new WaitForSeconds(0.5f); 
 
-        // Activation de la hitbox
         meleeHitbox.SetActive(true);
         Debug.Log("Boss frappe !");
-        yield return new WaitForSeconds(0.3f); // fenêtre de dégâts
+        yield return new WaitForSeconds(0.3f); 
         meleeHitbox.SetActive(false);
 
-        // Retour au neutre
         yield return new WaitForSeconds(0.2f);
         isAttacking = false;
     }
 
     void RangedAttack()
     {
-        Debug.Log("Boss lance une attaque à distance !");
+        Debug.Log("Boss lance un projectile ciblé !");
 
-        int randomDir = Random.Range(0, 2); // 0 = gauche, 1 = droite
-        Vector2 direction = (randomDir == 0) ? Vector2.left : Vector2.right;
+        Vector2 direction = (player.position - transform.position).normalized;
 
         GameObject proj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+
         Rigidbody2D rb = proj.GetComponent<Rigidbody2D>();
+
         if (rb != null)
         {
             rb.velocity = direction * projectileSpeed;
         }
     }
+
 }
