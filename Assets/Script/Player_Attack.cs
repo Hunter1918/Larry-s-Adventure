@@ -1,41 +1,74 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class Player_Attack : MonoBehaviour
 {
-    public GameObject AttackArea = default;
-    private bool attacking = false;
+    public GameObject normalHitbox;
+    public GameObject chargedHitbox;
 
-    private float attackTime = 0.25f;
-    private float timer = 0f;
+    public float normalAttackDelay = 0.3f;
+    public float chargedAttackDelay = 0.6f;
+    public float chargedHealthCost = 0.2f;
+
+    private bool isAttacking = false;
+    private PlayerHealth playerHealth;
+    private SpriteRenderer sr;
+
     void Start()
     {
-        AttackArea = transform.GetChild(0).gameObject;
-        AttackArea.SetActive(false);
+        playerHealth = GetComponent<PlayerHealth>();
+        sr = GetComponent<SpriteRenderer>();
+
+        normalHitbox.SetActive(false);
+        chargedHitbox.SetActive(false);
     }
 
     void Update()
     {
+        if (isAttacking) return;
+
         if (Input.GetKeyDown(KeyCode.F))
         {
-            Attack();
+            StartCoroutine(DoAttack(normalHitbox, normalAttackDelay, false));
         }
-        if (attacking)
+
+        if (Input.GetKeyDown(KeyCode.G))
         {
-            timer += Time.deltaTime;
-            if (timer >= attackTime)
+            float cost = Mathf.Ceil(playerHealth.maxHealth * chargedHealthCost);
+            if (playerHealth.GetCurrentHealth() > cost)
             {
-                timer = 0f;
-                attacking = false;
-                AttackArea.SetActive(false);
+                playerHealth.TakeDamage((int)cost);
+                StartCoroutine(DoAttack(chargedHitbox, chargedAttackDelay, true));
+            }
+            else
+            {
+                Debug.Log("Pas assez de vie pour attaque chargée !");
             }
         }
     }
 
-    void Attack()
+    IEnumerator DoAttack(GameObject hitboxGO, float delay, bool isCharged)
     {
-        attacking = true;
-        AttackArea.SetActive(attacking);
+        isAttacking = true;
+
+        PlayerMeleeHitbox hitbox = hitboxGO.GetComponent<PlayerMeleeHitbox>();
+        hitbox.ShowZone();
+
+        sr.DOKill();
+        Color flashColor = isCharged ? Color.red : Color.yellow;
+        sr.color = flashColor;
+        sr.DOColor(Color.white, 0.2f).SetEase(Ease.Linear);
+
+        yield return new WaitForSeconds(0.1f);
+
+        hitbox.EnableDamageWindow();
+        hitbox.TriggerDamage();
+        hitbox.DisableDamageWindow();
+
+        yield return new WaitForSeconds(delay);
+
+        hitbox.HideZone();
+        isAttacking = false;
     }
 }
