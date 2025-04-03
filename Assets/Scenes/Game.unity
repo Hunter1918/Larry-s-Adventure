@@ -1657,7 +1657,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 693eb8d3ac0273d408695151e246274b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 10
+  maxHealth: 100
   healthSlider: {fileID: 674436723}
 --- !u!82 &420194833
 AudioSource:
@@ -2492,7 +2492,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43c809d7769868a4688fbf15cc40f1ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 3
+  damage: 10
 --- !u!61 &816933186
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -6359,6 +6359,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 10
   healthSlider: {fileID: 2093186834}
+  invincibilityDuration: 1
+  isChargingAttack: 0
+  knockbackForce: 5
 --- !u!1 &2080452895
 GameObject:
   m_ObjectHideFlags: 0

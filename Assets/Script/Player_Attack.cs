@@ -14,11 +14,13 @@ public class Player_Attack : MonoBehaviour
     private bool isAttacking = false;
     private PlayerHealth playerHealth;
     private SpriteRenderer sr;
+    private CharacterController characterController;
 
     void Start()
     {
         playerHealth = GetComponent<PlayerHealth>();
         sr = GetComponent<SpriteRenderer>();
+        characterController = GetComponent<CharacterController>();
 
         normalHitbox.SetActive(false);
         chargedHitbox.SetActive(false);
@@ -52,6 +54,14 @@ public class Player_Attack : MonoBehaviour
     {
         isAttacking = true;
 
+        if (isCharged)
+        {
+            playerHealth.isChargingAttack = true;
+
+            if (characterController != null)
+                StartCoroutine(SlowMovementTemporarily(1f, 0.5f)); 
+        }
+
         PlayerMeleeHitbox hitbox = hitboxGO.GetComponent<PlayerMeleeHitbox>();
         hitbox.ShowZone();
 
@@ -70,5 +80,21 @@ public class Player_Attack : MonoBehaviour
 
         hitbox.HideZone();
         isAttacking = false;
+
+        if (isCharged)
+            playerHealth.isChargingAttack = false;
+    }
+
+    IEnumerator SlowMovementTemporarily(float duration, float speedMultiplier)
+    {
+        var moveSpeedField = typeof(CharacterController).GetField("moveSpeed", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        if (moveSpeedField == null) yield break;
+
+        float originalSpeed = (float)moveSpeedField.GetValue(characterController);
+        moveSpeedField.SetValue(characterController, originalSpeed * speedMultiplier);
+
+        yield return new WaitForSeconds(duration);
+
+        moveSpeedField.SetValue(characterController, originalSpeed);
     }
 }

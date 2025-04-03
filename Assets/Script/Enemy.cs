@@ -145,7 +145,17 @@ public class Enemy : MonoBehaviour
     {
         Debug.Log($"{gameObject.name} attaque le joueur !");
         lastAttackTime = Time.time;
+
+        if (targetPlayer != null)
+        {
+            PlayerHealth playerHealth = targetPlayer.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(1); 
+            }
+        }
     }
+
 
     Vector2 PlayerPosition()
     {
