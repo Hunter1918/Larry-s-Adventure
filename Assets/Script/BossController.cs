@@ -1,12 +1,13 @@
 using UnityEngine;
 using System.Collections;
-
+using DG.Tweening;
 public class BossController : MonoBehaviour
 {
     [Header("Références")]
     public Transform player;
     public GameObject meleeHitbox;
     public GameObject projectilePrefab;
+    public GameObject PlayerObject;
 
     [Header("Paramètres de distance")]
     public float meleeRange = 3f;
@@ -18,10 +19,21 @@ public class BossController : MonoBehaviour
     [Header("Vitesse des projectiles")]
     public float projectileSpeed = 8f;
 
+    [Header("Color attaque changed")]
+    private SpriteRenderer spriteRenderer;
+
+    [Header("DOtween Animation")]
+
+
     private float meleeTimer = 0f;
     private float rangedTimer = 0f;
     private bool isAttacking = false;
 
+
+    private void Start()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
     void Update()
     {
         if (isAttacking) return;
@@ -52,16 +64,19 @@ public class BossController : MonoBehaviour
     IEnumerator MeleeAttack()
     {
         isAttacking = true;
-
+        spriteRenderer.color = new Color(1, 1, 1, 0.1f);
         Debug.Log("Boss prépare une attaque de mêlée...");
-        yield return new WaitForSeconds(0.5f); 
+        yield return new WaitForSeconds(1f);
 
         meleeHitbox.SetActive(true);
         Debug.Log("Boss frappe !");
-        yield return new WaitForSeconds(0.3f); 
+        spriteRenderer.color = Color.blue;
+        yield return new WaitForSeconds(0.3f);
+        //Destroy(PlayerObject);
         meleeHitbox.SetActive(false);
 
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(3f);
+        spriteRenderer.color = Color.red;
         isAttacking = false;
     }
 

@@ -1174,7 +1174,8 @@ MonoBehaviour:
   meleeHitbox: {fileID: 1289452887}
   projectilePrefab: {fileID: 5105305113928509987, guid: 8399d98e86744f84a821bd71238762f2,
     type: 3}
-  meleeRange: 3
+  PlayerObject: {fileID: 2020468550}
+  meleeRange: 5
   meleeCooldown: 2
   rangedCooldown: 3
   projectileSpeed: 8
@@ -1204,7 +1205,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 7
+  m_Constraints: 5
 --- !u!61 &420194830
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2750,7 +2751,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0, y: 0}
+  m_AnchoredPosition: {x: -0, y: 0.44}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1151644071
@@ -3190,11 +3191,10 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 0, y: 1}
-      - {x: -0.95105654, y: 0.30901697}
-      - {x: -0.5877852, y: -0.80901706}
-      - {x: 0.58778536, y: -0.80901694}
-      - {x: 0.9510565, y: 0.30901712}
+    - - {x: -0.48544604, y: -0.5097471}
+      - {x: -0.4884693, y: 0.45623255}
+      - {x: -1.0155714, y: 0.45647934}
+      - {x: -1.01174, y: -0.5140923}
   m_UseDelaunayMesh: 0
 --- !u!4 &1289452889
 Transform:

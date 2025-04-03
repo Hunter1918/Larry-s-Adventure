@@ -24,10 +24,10 @@ public class PauseMenu : MonoBehaviour
 
     void Update()
 {
-        Debug.Log("Update actif");
+        //Debug.Log("Update actif");
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            Debug.Log("Touche Escape détectée");
+            //Debug.Log("Touche Escape détectée");
             if (settingsMenuUI.activeSelf)
             BackToPauseMenu();
         else if (isPaused)
