@@ -1,10 +1,12 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PauseMenu : MonoBehaviour
 {
     public GameObject pauseMenuUI;
     public GameObject settingsMenuUI;
+    public string gameSceneName;
 
     public Button resumeButton;
     public Button settingsButton;
@@ -63,5 +65,10 @@ public class PauseMenu : MonoBehaviour
     {
         settingsMenuUI.SetActive(false);
         pauseMenuUI.SetActive(true);
+    }
+
+    public void ReturnMenu()
+    {
+        SceneManager.LoadScene(gameSceneName);
     }
 }

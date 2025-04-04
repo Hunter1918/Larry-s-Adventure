@@ -30,4 +30,3 @@ public class Menu_Starting_Game : MonoBehaviour
         Application.Quit();
     }
 }
-
