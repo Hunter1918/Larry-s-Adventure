@@ -18,6 +18,7 @@ public class Enemy : MonoBehaviour
     [Header("Attaque")]
     public float attackCooldown = 2f;
     private float lastAttackTime;
+    public int damageToPlayer = 1;
 
     [Header("Debug")]
     public bool showRaycast = true;
@@ -151,7 +152,7 @@ public class Enemy : MonoBehaviour
             PlayerHealth playerHealth = targetPlayer.GetComponent<PlayerHealth>();
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(1); 
+                playerHealth.TakeDamage(damageToPlayer); 
             }
         }
     }

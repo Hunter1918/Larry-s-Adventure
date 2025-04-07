@@ -9,7 +9,7 @@ public class PlayerMeleeHitbox : MonoBehaviour
     private SpriteRenderer sr;
     private Collider2D col;
 
-    public int damage = 3;
+    public int damage = 2;
 
     private void Awake()
     {
@@ -83,6 +83,23 @@ public class PlayerMeleeHitbox : MonoBehaviour
                 boss.TakeDamage(damage);
                 Debug.Log("Boss touché par attaque !");
             }
+
+            ExplosiveEnemy ex = enemyInZone.GetComponent<ExplosiveEnemy>();
+            if (ex != null)
+            {
+                ex.Damage(damage);
+                Debug.Log("Slime explosif touché !");
+                return;
+            }
+
+            FlyingEnemy fe = enemyInZone.GetComponent<FlyingEnemy>();
+            if (fe != null)
+            {
+                fe.Damage(damage);
+                Debug.Log("Slime Vollant touché !");
+                return;
+            }
         }
+
     }
 }

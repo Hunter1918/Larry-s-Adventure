@@ -34,6 +34,7 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+
     public void TakeDamage(int amount)
     {
         if (isInvincible) return;
