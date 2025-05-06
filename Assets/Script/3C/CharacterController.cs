@@ -39,7 +39,6 @@ public class CharacterController : MonoBehaviour
     [SerializeField]
     private float airControlFactor = 0.5f;
     private Rigidbody2D rb;
-
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
