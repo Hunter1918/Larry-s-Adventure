@@ -2,26 +2,16 @@ using UnityEngine;
 
 public class WarpZone : MonoBehaviour
 {
-    //public Material newSkyboxMaterial; // Skybox material � changer
-    public Transform teleportDestination; // Destination de t�l�portation du joueur
+    public Transform teleportDestination; 
 
 
-    private void OnCollisionEnter2D(Collider other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            //ChangeSkybox();
-            TeleportPlayer(other.transform); // Passer le transform du joueur � la fonction
+            TeleportPlayer(other.transform); 
         }
     }
-
-    /*private void ChangeSkybox()
-    {
-        if (RenderSettings.skybox != null)
-        {
-            RenderSettings.skybox = newSkyboxMaterial;
-        }
-    }*/
 
     private void TeleportPlayer(Transform player)
     {
