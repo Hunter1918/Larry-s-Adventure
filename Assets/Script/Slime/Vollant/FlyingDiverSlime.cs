@@ -3,10 +3,21 @@ using UnityEngine;
 
 public class FlyingDiverSlime : MonoBehaviour
 {
-    [Header("Mouvements & Détection")]
+    [Header("Détection & Patrouille")]
     public float moveSpeed = 2f;
-    public float hoverHeight = 3f;
     public float detectionRange = 8f;
+    public Transform pointA;
+    public Transform pointB;
+    private Vector3 currentTarget;
+    private bool playerDetected = false;
+
+    [Header("Vol & Plongeon")]
+    public float hoverHeight = 3f;
+    public float diveCooldown = 6f;
+    public float diveSpeed = 10f;
+    public float stunDuration = 2f;
+    public float contactRadius = 0.5f;
+    public int contactDamage = 1;
 
     [Header("Tir")]
     public GameObject projectilePrefab;
@@ -15,30 +26,25 @@ public class FlyingDiverSlime : MonoBehaviour
     public int burstCount = 3;
     public float burstInterval = 0.2f;
 
-    [Header("Plongeon")]
-    public float diveCooldown = 6f;
-    public float diveSpeed = 10f;
-    public float stunDuration = 2f;
-    public float contactRadius = 0.5f;
-    public int contactDamage = 1;
-
     [Header("Vie")]
     public int maxHealth = 10;
     private int currentHealth;
 
     private Transform player;
+    private Rigidbody2D rb;
+    private Animator animator;
+
     private float lastShootTime;
     private float lastDiveTime;
     private bool isDiving = false;
     private bool isStunned = false;
-    private Rigidbody2D rb;
-    private Animator animator;
 
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
         rb = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
+        currentTarget = pointA.position;
 
         if (TryGetComponent(out Animator anim))
             animator = anim;
@@ -48,20 +54,47 @@ public class FlyingDiverSlime : MonoBehaviour
     {
         if (player == null || isDiving || isStunned) return;
 
-        HoverFollowPlayer();
+        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
-        float distance = Vector2.Distance(transform.position, player.position);
-        if (distance <= detectionRange && Time.time >= lastShootTime + shootCooldown)
+        // Détection avec hysteresis pour éviter clignotements
+        if (distanceToPlayer <= detectionRange)
+            playerDetected = true;
+        else if (playerDetected && distanceToPlayer > detectionRange * 1.5f)
+            playerDetected = false;
+
+        if (playerDetected)
         {
-            StartCoroutine(ShootBurst());
-            lastShootTime = Time.time;
+            HoverFollowPlayer();
+
+            if (Time.time >= lastShootTime + shootCooldown)
+            {
+                StartCoroutine(ShootBurst());
+                lastShootTime = Time.time;
+            }
+
+            if (Time.time >= lastDiveTime + diveCooldown)
+            {
+                StartCoroutine(DoDiveAttack());
+                lastDiveTime = Time.time;
+            }
+        }
+        else
+        {
+            Patrol();
+        }
+    }
+
+    void Patrol()
+    {
+        Vector2 moveDir = (currentTarget - transform.position).normalized;
+        rb.velocity = moveDir * moveSpeed;
+
+        if (Vector2.Distance(transform.position, currentTarget) < 0.2f)
+        {
+            currentTarget = (currentTarget == pointA.position) ? pointB.position : pointA.position;
         }
 
-        if (Time.time >= lastDiveTime + diveCooldown)
-        {
-            StartCoroutine(DoDiveAttack());
-            lastDiveTime = Time.time;
-        }
+        if (animator) animator.SetBool("IsFlying", true);
     }
 
     void HoverFollowPlayer()
@@ -149,6 +182,7 @@ public class FlyingDiverSlime : MonoBehaviour
             Die();
         }
     }
+
     IEnumerator FlashSprite()
     {
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
@@ -165,12 +199,12 @@ public class FlyingDiverSlime : MonoBehaviour
         }
     }
 
-
     void Die()
     {
         Debug.Log("💀 Slime volant mort !");
         Destroy(gameObject);
     }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.collider.CompareTag("Player"))
@@ -183,5 +217,4 @@ public class FlyingDiverSlime : MonoBehaviour
             }
         }
     }
-
 }
