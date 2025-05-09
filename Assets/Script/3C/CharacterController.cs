@@ -41,6 +41,7 @@ public class CharacterController : MonoBehaviour
     private Rigidbody2D rb;
     void Start()
     {
+        Time.timeScale = 1f;
         rb = GetComponent<Rigidbody2D>();
     }
 
