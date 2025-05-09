@@ -9,7 +9,7 @@ public class WarpZone : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            TeleportPlayer(other.transform); 
+            TeleportPlayer(other.transform);
         }
     }
 

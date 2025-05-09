@@ -6,16 +6,11 @@ using UnityEngine.UI;
 public class Player_Kill : MonoBehaviour
 {
     [Header("Références")]
-    public Transform player; 
-    public Transform respawnPoint; 
-    public CinemachineVirtualCamera virtualCam; 
-
-    [Header("Délai avant respawn")]
-    public float respawnDelay = 0.5f; 
-
-    [Header("Effet de fondu noir")]
-    public Image fadeImage; 
-    public float fadeDuration = 0.5f; 
+    public Transform player;
+    public CinemachineVirtualCamera virtualCam;
+    public Image fadeImage;
+    public float fadeDuration = 0.5f;
+    public float respawnDelay = 0.5f;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -31,20 +26,19 @@ public class Player_Kill : MonoBehaviour
 
         yield return new WaitForSeconds(respawnDelay);
 
-        if (player != null && respawnPoint != null)
+        Vector3 checkpointPos = CheckpointManager.Instance.GetLastCheckpointPosition();
+        if (checkpointPos != Vector3.zero)
         {
-            player.position = respawnPoint.position;
-
+            player.position = checkpointPos;
             if (virtualCam != null)
             {
                 virtualCam.Follow = player;
-                virtualCam.OnTargetObjectWarped(player, respawnPoint.position - player.position);
-
+                virtualCam.OnTargetObjectWarped(player, checkpointPos - player.position);
             }
         }
         else
         {
-            Debug.LogWarning("RespawnZone : Le joueur ou le point de réapparition n'est pas défini !");
+            Debug.LogWarning("Aucun checkpoint défini !");
         }
 
         yield return StartCoroutine(FadeFromBlack());
@@ -52,29 +46,23 @@ public class Player_Kill : MonoBehaviour
 
     IEnumerator FadeToBlack()
     {
-        if (fadeImage != null)
+        float alpha = 0f;
+        while (alpha < 1f)
         {
-            float alpha = 0f;
-            while (alpha < 1f)
-            {
-                alpha += Time.deltaTime / fadeDuration;
-                fadeImage.color = new Color(0, 0, 0, alpha);
-                yield return null;
-            }
+            alpha += Time.deltaTime / fadeDuration;
+            fadeImage.color = new Color(0, 0, 0, alpha);
+            yield return null;
         }
     }
 
     IEnumerator FadeFromBlack()
     {
-        if (fadeImage != null)
+        float alpha = 1f;
+        while (alpha > 0f)
         {
-            float alpha = 1f;
-            while (alpha > 0f)
-            {
-                alpha -= Time.deltaTime / fadeDuration;
-                fadeImage.color = new Color(0, 0, 0, alpha);
-                yield return null;
-            }
+            alpha -= Time.deltaTime / fadeDuration;
+            fadeImage.color = new Color(0, 0, 0, alpha);
+            yield return null;
         }
     }
 }
