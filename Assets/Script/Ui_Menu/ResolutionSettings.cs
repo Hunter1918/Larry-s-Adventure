@@ -1,75 +1,68 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using TMPro;
 
 public class ResolutionSettings : MonoBehaviour
 {
-    public TMP_Dropdown resolutionDropdown;
-    public Button applyButton;
+    public Dropdown resolutionDropdown;
+    public Toggle fullscreenToggle;
 
-    private List<Resolution> availableResolutions = new List<Resolution>();
-    private int currentResolutionIndex = 0;
+    private Resolution[] resolutions;
+    private int currentResolutionIndex;
 
     void Start()
     {
+        resolutions = Screen.resolutions;
         resolutionDropdown.ClearOptions();
-        Resolution[] resolutions = Screen.resolutions;
+
         List<string> options = new List<string>();
+
+        currentResolutionIndex = 0;
 
         for (int i = 0; i < resolutions.Length; i++)
         {
-            Resolution res = resolutions[i];
-            string option = res.width + "x" + res.height;
+            string option = resolutions[i].width + "x" + resolutions[i].height;
+            options.Add(option);
 
-            if (!options.Contains(option))
+            if (resolutions[i].width == Screen.currentResolution.width &&
+                resolutions[i].height == Screen.currentResolution.height)
             {
-                options.Add(option);
-                availableResolutions.Add(res);
+                currentResolutionIndex = i;
             }
         }
 
         resolutionDropdown.AddOptions(options);
 
-        // On vérifie s'il y a une résolution sauvegardée
-        if (PlayerPrefs.HasKey("resolutionIndex"))
-        {
-            currentResolutionIndex = PlayerPrefs.GetInt("resolutionIndex");
-        }
-        else
-        {
-            // Sinon on prend la résolution actuelle
-            Resolution current = Screen.currentResolution;
-            for (int i = 0; i < availableResolutions.Count; i++)
-            {
-                if (availableResolutions[i].width == current.width &&
-                    availableResolutions[i].height == current.height)
-                {
-                    currentResolutionIndex = i;
-                    break;
-                }
-            }
-        }
+        // Chargement des préférences sauvegardées
+        currentResolutionIndex = PlayerPrefs.GetInt("resolutionIndex", currentResolutionIndex);
+        bool isFullscreen = PlayerPrefs.GetInt("fullscreen", Screen.fullScreen ? 1 : 0) == 1;
 
         resolutionDropdown.value = currentResolutionIndex;
+        fullscreenToggle.isOn = isFullscreen;
         resolutionDropdown.RefreshShownValue();
 
-        applyButton.onClick.AddListener(ApplyResolution);
+        ApplyResolution(); // Appliquer au démarrage
+    }
 
-        // Appliquer automatiquement la résolution sauvegardée
-        ApplyResolution();
+    public void OnResolutionChange(int index)
+    {
+        currentResolutionIndex = index;
+    }
+
+    public void OnFullscreenToggle(bool isFullscreen)
+    {
+        Screen.fullScreen = isFullscreen;
     }
 
     public void ApplyResolution()
     {
-        int index = resolutionDropdown.value;
-        Resolution selectedRes = availableResolutions[index];
-        Screen.SetResolution(selectedRes.width, selectedRes.height, Screen.fullScreen);
+        Resolution resolution = resolutions[currentResolutionIndex];
+        bool isFullscreen = fullscreenToggle.isOn;
+        Screen.SetResolution(resolution.width, resolution.height, isFullscreen);
 
-        // Sauvegarder l’index choisi
-        PlayerPrefs.SetInt("resolutionIndex", index);
+        // Sauvegarde des préférences
+        PlayerPrefs.SetInt("resolutionIndex", currentResolutionIndex);
+        PlayerPrefs.SetInt("fullscreen", isFullscreen ? 1 : 0);
         PlayerPrefs.Save();
-
-        Debug.Log("Résolution appliquée et sauvegardée : " + selectedRes.width + "x" + selectedRes.height);
     }
 }

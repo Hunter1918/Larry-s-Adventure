@@ -19,7 +19,10 @@ public class Player_Kill : MonoBehaviour
             StartCoroutine(RespawnPlayer());
         }
     }
-
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        
+    }
     IEnumerator RespawnPlayer()
     {
         yield return StartCoroutine(FadeToBlack());
