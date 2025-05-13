@@ -1,11 +1,13 @@
-using UnityEngine;
+ï»¿using UnityEngine;
+using TMPro;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
 public class ResolutionSettings : MonoBehaviour
 {
-    public Dropdown resolutionDropdown;
+    public TMP_Dropdown resolutionDropdown;
     public Toggle fullscreenToggle;
+    public Slider volumeSlider;
 
     private Resolution[] resolutions;
     private int currentResolutionIndex;
@@ -16,7 +18,6 @@ public class ResolutionSettings : MonoBehaviour
         resolutionDropdown.ClearOptions();
 
         List<string> options = new List<string>();
-
         currentResolutionIndex = 0;
 
         for (int i = 0; i < resolutions.Length; i++)
@@ -33,36 +34,38 @@ public class ResolutionSettings : MonoBehaviour
 
         resolutionDropdown.AddOptions(options);
 
-        // Chargement des préférences sauvegardées
-        currentResolutionIndex = PlayerPrefs.GetInt("resolutionIndex", currentResolutionIndex);
+        int savedWidth = PlayerPrefs.GetInt("resolutionWidth", Screen.currentResolution.width);
+        int savedHeight = PlayerPrefs.GetInt("resolutionHeight", Screen.currentResolution.height);
         bool isFullscreen = PlayerPrefs.GetInt("fullscreen", Screen.fullScreen ? 1 : 0) == 1;
+
+        for (int i = 0; i < resolutions.Length; i++)
+        {
+            if (resolutions[i].width == savedWidth && resolutions[i].height == savedHeight)
+            {
+                currentResolutionIndex = i;
+                break;
+            }
+        }
 
         resolutionDropdown.value = currentResolutionIndex;
         fullscreenToggle.isOn = isFullscreen;
+        volumeSlider.value = PlayerPrefs.GetFloat("volume", 1f);
         resolutionDropdown.RefreshShownValue();
-
-        ApplyResolution(); // Appliquer au démarrage
     }
 
-    public void OnResolutionChange(int index)
+    public void ApplySettings()
     {
-        currentResolutionIndex = index;
-    }
-
-    public void OnFullscreenToggle(bool isFullscreen)
-    {
-        Screen.fullScreen = isFullscreen;
-    }
-
-    public void ApplyResolution()
-    {
-        Resolution resolution = resolutions[currentResolutionIndex];
+        Resolution resolution = resolutions[resolutionDropdown.value];
         bool isFullscreen = fullscreenToggle.isOn;
-        Screen.SetResolution(resolution.width, resolution.height, isFullscreen);
+        float volume = volumeSlider.value;
 
-        // Sauvegarde des préférences
-        PlayerPrefs.SetInt("resolutionIndex", currentResolutionIndex);
-        PlayerPrefs.SetInt("fullscreen", isFullscreen ? 1 : 0);
+        Screen.SetResolution(resolution.width, resolution.height, isFullscreen);
+        AudioListener.volume = volume;
+
+        if (ResolutionManager.Instance != null)
+            ResolutionManager.Instance.SaveResolution(resolution.width, resolution.height, isFullscreen);
+
+        PlayerPrefs.SetFloat("volume", volume);
         PlayerPrefs.Save();
     }
 }

@@ -71,7 +71,7 @@ public class CharacterController : MonoBehaviour
 
     private void Jump()
     {
-        int index = Random.Range(0,MashUp.Length);
+        int index = Random.Range(0, MashUp.Length);
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             JeSaute.PlayOneShot(MashUp[index]);
@@ -93,7 +93,7 @@ public class CharacterController : MonoBehaviour
         float controlFactor = isGrounded ? 1f : airControlFactor;
 
         if (moveInput != 0)
-            rb.velocity = new Vector2(Mathf.Lerp(rb.velocity.x,moveInput * moveSpeed,acceleration * controlFactor * Time.deltaTime), rb.velocity.y);
+            rb.velocity = new Vector2(Mathf.Lerp(rb.velocity.x, moveInput * moveSpeed, acceleration * controlFactor * Time.deltaTime), rb.velocity.y);
         else
             rb.velocity = new Vector2(Mathf.Lerp(rb.velocity.x, 0, deceleration * Time.deltaTime), rb.velocity.y);
     }

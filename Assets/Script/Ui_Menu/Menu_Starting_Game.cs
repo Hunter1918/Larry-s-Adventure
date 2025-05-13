@@ -11,6 +11,7 @@ public class Menu_Starting_Game : MonoBehaviour
 
     private void Start()
     {
+        Time.timeScale = 1f;
         Settings.SetActive(false);
     }
     public void SettingMainMenu()
