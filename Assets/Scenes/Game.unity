@@ -8925,7 +8925,7 @@ MonoBehaviour:
   player: {fileID: 2020468554}
   virtualCam: {fileID: 764799178}
   smoothSpeed: 5
-  horizontalLag: 0.01
+  horizontalLag: 2
   verticalOffset: 0
   horizontalOffset: 6
   velocity: {x: 0, y: 0, z: 0}
@@ -23319,6 +23319,37 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1954783418
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1954783419}
+  m_Layer: 6
+  m_Name: AttackProjectile
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1954783419
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1954783418}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.2143793, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2020468554}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1962083667
 GameObject:
   m_ObjectHideFlags: 0
@@ -24318,6 +24349,7 @@ Transform:
   m_Children:
   - {fileID: 203117031}
   - {fileID: 816933184}
+  - {fileID: 1954783419}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2020468555
@@ -24365,6 +24397,10 @@ MonoBehaviour:
   normalAttackDelay: 0.3
   chargedAttackDelay: 0.6
   chargedHealthCost: 0.2
+  projectilePrefab: {fileID: 5105305113928509987, guid: d97133ddec9bca94fb56612a021e2fa6,
+    type: 3}
+  firePoint: {fileID: 1954783419}
+  projectileSpeed: 10
 --- !u!82 &2020468557
 AudioSource:
   m_ObjectHideFlags: 0

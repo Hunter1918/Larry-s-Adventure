@@ -4,12 +4,19 @@ using DG.Tweening;
 
 public class Player_Attack : MonoBehaviour
 {
+    [Header("Hitbox Attacks")]
     public GameObject normalHitbox;
     public GameObject chargedHitbox;
 
+    [Header("Delays")]
     public float normalAttackDelay = 0.3f;
     public float chargedAttackDelay = 0.6f;
     public float chargedHealthCost = 0.2f;
+
+    [Header("Projectile Attack")]
+    public GameObject projectilePrefab;
+    public Transform firePoint;
+    public float projectileSpeed = 10f;
 
     private bool isAttacking = false;
     private PlayerHealth playerHealth;
@@ -47,6 +54,46 @@ public class Player_Attack : MonoBehaviour
             {
                 Debug.Log("Pas assez de vie pour attaque chargée !");
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            TryShootProjectile();
+        }
+    }
+
+    void TryShootProjectile()
+    {
+        int currentHealth = playerHealth.GetCurrentHealth();
+        int cost = Mathf.Max(1, Mathf.FloorToInt(currentHealth * 0.01f));
+
+        if (currentHealth - cost <= 0)
+        {
+            Debug.Log("Trop peu de vie pour tirer un projectile !");
+            return;
+        }
+
+        playerHealth.TakeDamage(cost);
+        ShootProjectile();
+    }
+
+    void ShootProjectile()
+    {
+        if (projectilePrefab == null || firePoint == null)
+        {
+            Debug.LogWarning("Projectile prefab ou firePoint non assigné !");
+            return;
+        }
+
+        GameObject proj = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
+
+        float direction = characterController.FacingRight ? 1f : -1f;
+
+
+        BoneProjectile bone = proj.GetComponent<BoneProjectile>();
+        if (bone != null)
+        {
+            bone.SetDirection(direction);
         }
     }
 

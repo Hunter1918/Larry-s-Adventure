@@ -14,6 +14,8 @@ public class CharacterController : MonoBehaviour
     private float deceleration = 15f;
     private float moveInput;
     private bool facingRight = true;
+    public bool FacingRight => facingRight;
+
 
     [Header("Saut")]
     [SerializeField]
@@ -39,6 +41,7 @@ public class CharacterController : MonoBehaviour
     [SerializeField]
     private float airControlFactor = 0.5f;
     private Rigidbody2D rb;
+
     void Start()
     {
         Time.timeScale = 1f;
