@@ -16,22 +16,14 @@ public class AdvancedCamera2D : MonoBehaviour
     public float verticalOffset = 2f;
     public float horizontalOffset = 2f;
 
-    [Header("Zoom Dynamique")]
-    public float zoomOutFactor = 1.5f; 
-    public float zoomSpeed = 2f; 
-
-    [Header("Effet Shake")]
-    public float shakeIntensity = 2f;
-    public float shakeDuration = 0.2f;
-
     // ===== VARIABLES PRIVÉES =====
     [SerializeField] private Vector3 velocity = Vector3.zero;
-    private float defaultZoom;
-    private CinemachineBasicMultiChannelPerlin noise;
-    private bool isShaking = false;
+    //private float defaultZoom;
+    //private CinemachineBasicMultiChannelPerlin noise;
+    //private bool isShaking = false;
     private float playerDirection = 1f;
 
-    void Start()
+    /*void Start()
     {
         if (virtualCam != null)
         {
@@ -40,7 +32,7 @@ public class AdvancedCamera2D : MonoBehaviour
 
             defaultZoom = virtualCam.m_Lens.OrthographicSize;
         }
-    }
+    }*/
 
     void Update()
     {
@@ -59,49 +51,7 @@ public class AdvancedCamera2D : MonoBehaviour
             transform.position.z
         );
 
-        // ===== GESTION DU ZOOM DYNAMIQUE =====
-        if (rb != null)
-        {
-            if (rb.velocity.y < -1f) 
-            {
-                virtualCam.m_Lens.OrthographicSize = Mathf.Lerp(
-                    virtualCam.m_Lens.OrthographicSize,
-                    defaultZoom * zoomOutFactor,
-                    Time.deltaTime * zoomSpeed
-                );
-            }
-            else
-            {
-                virtualCam.m_Lens.OrthographicSize = Mathf.Lerp(
-                    virtualCam.m_Lens.OrthographicSize,
-                    defaultZoom,
-                    Time.deltaTime * zoomSpeed
-                );
-            }
-        }
-
-        // ===== EFFET DE SHAKE À L'ATTERRISSAGE =====
-        if (rb != null && rb.velocity.y == 0 && !isShaking)
-        {
-            float fallThreshold = -1f; 
-            if (rb.velocity.y <= fallThreshold)
-            {
-                StartCoroutine(ShakeCamera());
-            }
-        }
 
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, 1f / smoothSpeed);
-    }
-
-    private System.Collections.IEnumerator ShakeCamera()
-    {
-        isShaking = true;
-        if (noise != null)
-        {
-            noise.m_AmplitudeGain = shakeIntensity;
-            yield return new WaitForSeconds(shakeDuration);
-            noise.m_AmplitudeGain = 0f; 
-        }
-        isShaking = false;
     }
 }

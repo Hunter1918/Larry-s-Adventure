@@ -1,5 +1,4 @@
 using UnityEngine;
-using Cinemachine;
 using System.Collections;
 using UnityEngine.UI;
 
@@ -7,36 +6,37 @@ public class Player_Kill : MonoBehaviour
 {
     [Header("Références")]
     public Transform player;
-    public CinemachineVirtualCamera virtualCam;
     public Image fadeImage;
     public float fadeDuration = 0.5f;
     public float respawnDelay = 0.5f;
 
+    private bool isRespawning = false;
+
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !isRespawning)
         {
             StartCoroutine(RespawnPlayer());
         }
     }
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        
-    }
+
     IEnumerator RespawnPlayer()
     {
-        yield return StartCoroutine(FadeToBlack());
+        isRespawning = true;
 
+        yield return StartCoroutine(FadeToBlack());
         yield return new WaitForSeconds(respawnDelay);
 
         Vector3 checkpointPos = CheckpointManager.Instance.GetLastCheckpointPosition();
+
         if (checkpointPos != Vector3.zero)
         {
             player.position = checkpointPos;
-            if (virtualCam != null)
+
+            PlayerHealth ph = player.GetComponent<PlayerHealth>();
+            if (ph != null)
             {
-                virtualCam.Follow = player;
-                virtualCam.OnTargetObjectWarped(player, checkpointPos - player.position);
+                ph.ResetHealth();
             }
         }
         else
@@ -45,6 +45,8 @@ public class Player_Kill : MonoBehaviour
         }
 
         yield return StartCoroutine(FadeFromBlack());
+
+        isRespawning = false;
     }
 
     IEnumerator FadeToBlack()

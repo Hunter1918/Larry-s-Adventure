@@ -2,7 +2,9 @@ using UnityEngine;
 
 public class WarpZone : MonoBehaviour
 {
-    public Transform teleportDestination; 
+    public Transform teleportDestination;
+    public GameObject Level;
+    public GameObject Level_Next;
 
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -10,6 +12,7 @@ public class WarpZone : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             TeleportPlayer(other.transform);
+            Level.SetActive(false);
         }
     }
 
@@ -18,6 +21,7 @@ public class WarpZone : MonoBehaviour
         if (teleportDestination != null)
         {
             player.position = teleportDestination.position;
+            Level_Next.SetActive(true);
         }
     }
 }

@@ -13,6 +13,13 @@ public class CheckpointManager : MonoBehaviour
         else
             Destroy(gameObject);
     }
+    void Start()
+    {
+        if (lastCheckpointPosition == Vector3.zero && GameObject.FindGameObjectWithTag("Player") != null)
+        {
+            lastCheckpointPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
+        }
+    }
 
     public void SetCheckpoint(Vector3 position)
     {

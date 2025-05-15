@@ -100,7 +100,6 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // Prend des dégâts
     public void Damage(int amount)
     {
         health -= amount;
@@ -134,7 +133,6 @@ public class Enemy : MonoBehaviour
         spriteRenderer.color = Color.white;
     }
 
-    // Immobilise le slime temporairement
     IEnumerator DisableMovement(float duration)
     {
         canMove = false;
@@ -142,7 +140,6 @@ public class Enemy : MonoBehaviour
         canMove = true;
     }
 
-    // Cherche la position du joueur
     Vector2 PlayerPosition()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");

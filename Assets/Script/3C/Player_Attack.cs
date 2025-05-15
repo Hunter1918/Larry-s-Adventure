@@ -57,9 +57,6 @@ public class Player_Attack : MonoBehaviour
         if (isCharged)
         {
             playerHealth.isChargingAttack = true;
-
-            if (characterController != null)
-                StartCoroutine(SlowMovementTemporarily(1f, 0.5f)); 
         }
 
         PlayerMeleeHitbox hitbox = hitboxGO.GetComponent<PlayerMeleeHitbox>();
@@ -83,18 +80,5 @@ public class Player_Attack : MonoBehaviour
 
         if (isCharged)
             playerHealth.isChargingAttack = false;
-    }
-
-    IEnumerator SlowMovementTemporarily(float duration, float speedMultiplier)
-    {
-        var moveSpeedField = typeof(CharacterController).GetField("moveSpeed", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        if (moveSpeedField == null) yield break;
-
-        float originalSpeed = (float)moveSpeedField.GetValue(characterController);
-        moveSpeedField.SetValue(characterController, originalSpeed * speedMultiplier);
-
-        yield return new WaitForSeconds(duration);
-
-        moveSpeedField.SetValue(characterController, originalSpeed);
     }
 }
