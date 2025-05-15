@@ -39,6 +39,7 @@ public class CharacterController : MonoBehaviour
     [SerializeField]
     private float airControlFactor = 0.5f;
     private Rigidbody2D rb;
+
     void Start()
     {
         Time.timeScale = 1f;
