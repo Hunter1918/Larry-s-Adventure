@@ -8925,7 +8925,7 @@ MonoBehaviour:
   player: {fileID: 2020468554}
   virtualCam: {fileID: 764799178}
   smoothSpeed: 5
-  horizontalLag: 2
+  horizontalLag: 0.75
   verticalOffset: 0
   horizontalOffset: 6
   velocity: {x: 0, y: 0, z: 0}
@@ -24401,6 +24401,7 @@ MonoBehaviour:
     type: 3}
   firePoint: {fileID: 1954783419}
   projectileSpeed: 10
+  projectileCooldown: 0.5
 --- !u!82 &2020468557
 AudioSource:
   m_ObjectHideFlags: 0
@@ -24511,7 +24512,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 10
   healthSlider: {fileID: 2093186834}
-  invincibilityDuration: 1
+  invincibilityDuration: 0.5
   isChargingAttack: 0
   player: {fileID: 2020468554}
   virtualCam: {fileID: 0}

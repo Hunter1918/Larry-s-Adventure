@@ -23,6 +23,10 @@ public class Player_Attack : MonoBehaviour
     private SpriteRenderer sr;
     private CharacterController characterController;
 
+    [Header("Cooldown")]
+    public float projectileCooldown = 0.5f;
+    private float lastProjectileTime = -999f;
+
     void Start()
     {
         playerHealth = GetComponent<PlayerHealth>();
@@ -64,6 +68,12 @@ public class Player_Attack : MonoBehaviour
 
     void TryShootProjectile()
     {
+        if (Time.time < lastProjectileTime + projectileCooldown)
+        {
+            Debug.Log("Attaque à distance en cooldown !");
+            return;
+        }
+
         int currentHealth = playerHealth.GetCurrentHealth();
         int cost = Mathf.Max(1, Mathf.FloorToInt(currentHealth * 0.01f));
 
@@ -75,7 +85,10 @@ public class Player_Attack : MonoBehaviour
 
         playerHealth.TakeDamage(cost);
         ShootProjectile();
+
+        lastProjectileTime = Time.time;
     }
+
 
     void ShootProjectile()
     {
