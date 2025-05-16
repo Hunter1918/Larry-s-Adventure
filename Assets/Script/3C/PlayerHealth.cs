@@ -1,26 +1,29 @@
-using UnityEngine;
-using System.Collections;
+Ôªøusing UnityEngine;
+using System.Collections.Generic;
 using UnityEngine.UI;
 using DG.Tweening;
 using Cinemachine;
+using System.Collections;
 
 public class PlayerHealth : MonoBehaviour
 {
     [Header("Vie")]
-    public int maxHealth = 3;
+    public int maxHealth = 20;
     private int currentHealth;
 
-    [Header("UI")]
-    public Slider healthSlider;
-    private SpriteRenderer sr;
+    [Header("UI C≈ìurs")]
+    public Transform heartContainer;
+    public Image heartPrefab;
+    public List<Sprite> heartSprites; // 11 sprites : 0/10 -> 10/10
+    private List<Image> heartImages = new List<Image>();
 
-    [Header("InvincibilitÈ")]
+    [Header("Invincibilit√©")]
     private bool isInvincible = false;
     public float invincibilityDuration = 1f;
 
     [HideInInspector] public bool isChargingAttack = false;
-    
-    [Header("RÈfÈrences")]
+
+    [Header("R√©f√©rences")]
     public Transform player;
     public CinemachineVirtualCamera virtualCam;
 
@@ -30,6 +33,7 @@ public class PlayerHealth : MonoBehaviour
     public float respawnDelay = 0.5f;
 
     private Rigidbody2D rb;
+    private SpriteRenderer sr;
 
     void Start()
     {
@@ -37,15 +41,33 @@ public class PlayerHealth : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         currentHealth = maxHealth;
 
-        if (healthSlider != null)
-        {
-            healthSlider.maxValue = maxHealth;
-            healthSlider.value = currentHealth;
-        }
+        InitHearts();
 
         if (CheckpointManager.Instance != null && CheckpointManager.Instance.GetLastCheckpointPosition() == Vector3.zero)
         {
             CheckpointManager.Instance.SetCheckpoint(player.position);
+        }
+    }
+
+    void InitHearts()
+    {
+        int heartCount = maxHealth / 10; // Ici 2 c≈ìurs
+        for (int i = 0; i < heartCount; i++)
+        {
+            Image heart = Instantiate(heartPrefab, heartContainer);
+            heartImages.Add(heart);
+        }
+
+        UpdateHearts();
+    }
+
+    void UpdateHearts()
+    {
+        for (int i = 0; i < heartImages.Count; i++)
+        {
+            int startValue = i * 10;
+            int heartValue = Mathf.Clamp(currentHealth - startValue, 0, 10);
+            heartImages[i].sprite = heartSprites[heartValue];
         }
     }
 
@@ -59,8 +81,7 @@ public class PlayerHealth : MonoBehaviour
         Camera.main.transform.DOShakePosition(0.2f, 0.3f, 10, 90);
         sr.DOColor(Color.red, 0.05f).SetLoops(2, LoopType.Yoyo);
 
-        if (healthSlider != null)
-            healthSlider.value = currentHealth;
+        UpdateHearts();
 
         if (currentHealth <= 0)
             Die();
@@ -83,11 +104,6 @@ public class PlayerHealth : MonoBehaviour
         isInvincible = false;
     }
 
-    public int GetCurrentHealth()
-    {
-        return currentHealth;
-    }
-
     public void Die()
     {
         Debug.Log("Le joueur est mort !");
@@ -106,26 +122,22 @@ public class PlayerHealth : MonoBehaviour
             Vector3 oldPos = player.position;
             player.position = checkpointPos;
 
-            // RÈinitialisation correcte de Cinemachine
             if (virtualCam != null)
             {
                 virtualCam.Follow = player;
                 virtualCam.OnTargetObjectWarped(player, checkpointPos - oldPos);
             }
 
-            // RÈinitialisation de la vie
             currentHealth = maxHealth;
-            if (healthSlider != null)
-                healthSlider.value = currentHealth;
+            UpdateHearts();
         }
         else
         {
-            Debug.LogWarning("Aucun checkpoint dÈfini !");
+            Debug.LogWarning("Aucun checkpoint d√©fini !");
         }
 
         yield return StartCoroutine(FadeFromBlack());
     }
-
 
     IEnumerator FadeToBlack()
     {
@@ -154,12 +166,21 @@ public class PlayerHealth : MonoBehaviour
             }
         }
     }
+
     public void ResetHealth()
     {
         currentHealth = maxHealth;
-
-        if (healthSlider != null)
-            healthSlider.value = currentHealth;
+        UpdateHearts();
     }
 
+    public int GetCurrentHealth()
+    {
+        return currentHealth;
+    }
+
+    public void Heal(int amount)
+    {
+        currentHealth = Mathf.Min(currentHealth + amount, maxHealth);
+        UpdateHearts();
+    }
 }
