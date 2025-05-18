@@ -1,23 +1,52 @@
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 
 public class First_Main_Menu : MonoBehaviour
 {
-    public GameObject Canva;
-    public Animator animator;
+    public GameObject CanvaIntro;   // Le Canvas d’intro ("Appuyez sur une touche")
+    public GameObject CanvaMenu;    // Le Canvas du menu principal final
+
+    public Animator cameraAnimator; // Animator de la caméra
+    public Animator bookAnimator;   // Animator du livre
+
+    private bool hasStarted = false;
+
     void Start()
     {
         Time.timeScale = 1f;
-        Canva.SetActive(true);
+        CanvaIntro.SetActive(true);
+        CanvaMenu.SetActive(false);
+
+        // Reset sécurité (au cas où les bool restent bloqués d’un ancien play)
+        cameraAnimator.SetBool("StartCam", false);
+        bookAnimator.SetBool("StartAnim", false);
     }
 
     void Update()
     {
-        if (Input.anyKeyDown)
+        if (!hasStarted && Input.anyKeyDown)
         {
-            Canva.SetActive(false);
-            animator.SetTrigger("StartAnim");
+            hasStarted = true;
+            StartCoroutine(PlaySequence());
         }
+    }
+
+    IEnumerator PlaySequence()
+    {
+        Debug.Log("➡️ Fermeture du canvas d'intro");
+        CanvaIntro.SetActive(false);
+
+        Debug.Log("🎥 Lancement anim caméra");
+        cameraAnimator.SetBool("StartCam", true);
+        yield return new WaitForSeconds(1.5f); // adapte la durée si nécessaire
+
+        Debug.Log("📖 Lancement anim livre");
+        yield return new WaitForSeconds(0.1f); // avant de faire SetBool
+        bookAnimator.SetBool("StartAnim", true);
+
+        yield return new WaitForSeconds(1.5f); // adapte aussi
+
+        Debug.Log("✅ Affichage du menu");
+        CanvaMenu.SetActive(true);
     }
 }
