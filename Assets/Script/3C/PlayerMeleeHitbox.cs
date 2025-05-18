@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using DG.Tweening;
 
 public class PlayerMeleeHitbox : MonoBehaviour
@@ -36,6 +36,7 @@ public class PlayerMeleeHitbox : MonoBehaviour
         }
     }
 
+
     public void ShowZone()
     {
         DOTween.Kill("PlayerZonePulse");
@@ -67,39 +68,52 @@ public class PlayerMeleeHitbox : MonoBehaviour
 
     public void TriggerDamage()
     {
-        if (canDealDamage && enemyInZone != null)
+        if (!canDealDamage)
         {
-            Enemy e = enemyInZone.GetComponent<Enemy>();
-            if (e != null)
-            {
-                e.Damage(damage);
-                Debug.Log("Ennemi touch� par attaque !");
-                return;
-            }
-
-            BossHealth boss = enemyInZone.GetComponent<BossHealth>();
-            if (boss != null)
-            {
-                boss.TakeDamage(damage);
-                Debug.Log("Boss touch� par attaque !");
-            }
-
-            ExplosiveEnemy ex = enemyInZone.GetComponent<ExplosiveEnemy>();
-            if (ex != null)
-            {
-                ex.Damage(damage);
-                Debug.Log("Slime explosif touch� !");
-                return;
-            }
-
-            FlyingEnemy fe = enemyInZone.GetComponent<FlyingEnemy>();
-            if (fe != null)
-            {
-                fe.Damage(damage);
-                Debug.Log("Slime Vollant touch� !");
-                return;
-            }
+            Debug.LogWarning("❌ Tentative d'infliger des dégâts alors que le DamageWindow est fermé !");
+            return;
         }
 
+        if (enemyInZone == null || enemyInZone.gameObject == null)
+        {
+            Debug.Log("❌ Ennemi déjà détruit !");
+            return;
+        }
+
+        // Ensuite les GetComponent sécurisés
+        Enemy e = enemyInZone.GetComponent<Enemy>();
+        if (e != null)
+        {
+            e.Damage(damage);
+            Debug.Log("Ennemi touché par attaque !");
+            return;
+        }
+
+        BossHealth boss = enemyInZone.GetComponent<BossHealth>();
+        if (boss != null)
+        {
+            boss.TakeDamage(damage);
+            Debug.Log("Boss touché par attaque !");
+            return;
+        }
+
+        ExplosiveEnemy ex = enemyInZone.GetComponent<ExplosiveEnemy>();
+        if (ex != null)
+        {
+            ex.Damage(damage);
+            Debug.Log("Slime explosif touché !");
+            return;
+        }
+
+        FlyingEnemy fe = enemyInZone.GetComponent<FlyingEnemy>();
+        if (fe != null)
+        {
+            fe.Damage(damage);
+            Debug.Log("Slime Vollant touché !");
+            return;
+        }
+
+        Debug.LogWarning("⚠️ Aucun script d'ennemi trouvé sur " + enemyInZone.name);
     }
+
 }
