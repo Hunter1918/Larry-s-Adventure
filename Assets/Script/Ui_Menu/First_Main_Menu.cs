@@ -38,13 +38,13 @@ public class First_Main_Menu : MonoBehaviour
 
         Debug.Log("🎥 Lancement anim caméra");
         cameraAnimator.SetBool("StartCam", true);
-        yield return new WaitForSeconds(1.5f); // adapte la durée si nécessaire
+        yield return new WaitForSeconds(4f); // adapte la durée si nécessaire
 
         Debug.Log("📖 Lancement anim livre");
         yield return new WaitForSeconds(0.1f); // avant de faire SetBool
         bookAnimator.SetBool("StartAnim", true);
 
-        yield return new WaitForSeconds(1.5f); // adapte aussi
+        yield return new WaitForSeconds(4f); // adapte aussi
 
         Debug.Log("✅ Affichage du menu");
         CanvaMenu.SetActive(true);
