@@ -1,119 +1,113 @@
-﻿using UnityEngine;
-using DG.Tweening;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class PlayerMeleeHitbox : MonoBehaviour
 {
-    private Collider2D enemyInZone;
-    private bool canDealDamage = false;
-
-    private SpriteRenderer sr;
+    private List<Collider2D> enemiesInZone = new();
     private Collider2D col;
+    private bool canDealDamage = false;
+    private bool hasHit = false;
 
     public int damage = 2;
 
     private void Awake()
     {
-        sr = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
-
-        sr.enabled = false;
-        gameObject.SetActive(false);
+        if (col == null)
+            Debug.LogError("❌ Aucun Collider2D trouvé sur " + gameObject.name);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Enemy") || other.CompareTag("Boss")) 
+        if ((other.CompareTag("Enemy") || other.CompareTag("Boss")) && !enemiesInZone.Contains(other))
         {
-            enemyInZone = other;
+            enemiesInZone.Add(other);
+            Debug.Log("🎯 Ennemi détecté : " + other.name);
         }
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if ((other.CompareTag("Enemy") || other.CompareTag("Boss")) && other == enemyInZone)
+        if (enemiesInZone.Contains(other))
         {
-            enemyInZone = null;
+            enemiesInZone.Remove(other);
+            Debug.Log("↩️ Ennemi quitté : " + other.name);
         }
     }
 
-
-    public void ShowZone()
+    public void EnableDamageWindow()
     {
-        DOTween.Kill("PlayerZonePulse");
-        sr.DOKill();
+        canDealDamage = true;
+        hasHit = false;
+        enemiesInZone.Clear();
+        Debug.Log("🟢 Fenêtre de dégâts ouverte");
 
-        gameObject.SetActive(true);
-        sr.enabled = true;
-        col.enabled = true;
-
-        transform.localScale = Vector3.zero;
-        transform.DOScale(1f, 0.2f).SetEase(Ease.OutBack);
-        sr.DOFade(0.5f, 0.15f).SetLoops(-1, LoopType.Yoyo).SetId("PlayerZonePulse");
+        // ⛔ Supprime ou commente ça :
+        // Invoke(nameof(TriggerDamage), 0.1f);
     }
 
-    public void HideZone()
+
+    public void DisableDamageWindow()
     {
-        DOTween.Kill("PlayerZonePulse");
-        sr.DOKill();
-
-        sr.DOFade(0f, 0.1f).OnComplete(() => {
-            sr.enabled = false;
-            col.enabled = false;
-            gameObject.SetActive(false);
-        });
+        canDealDamage = false;
+        enemiesInZone.Clear();
+        Debug.Log("🔴 Fenêtre de dégâts fermée");
     }
-
-    public void EnableDamageWindow() => canDealDamage = true;
-    public void DisableDamageWindow() => canDealDamage = false;
 
     public void TriggerDamage()
     {
-        if (!canDealDamage)
+        Debug.Log("✅ TriggerDamage lancé par Animation Event !");
+
+        Debug.Log("⚡ TriggerDamage appelé");
+
+        if (!canDealDamage || hasHit)
         {
-            Debug.LogWarning("❌ Tentative d'infliger des dégâts alors que le DamageWindow est fermé !");
+            Debug.Log("⛔️ Pas autorisé à infliger des dégâts.");
             return;
         }
 
-        if (enemyInZone == null || enemyInZone.gameObject == null)
+        if (enemiesInZone.Count == 0)
         {
-            Debug.Log("❌ Ennemi déjà détruit !");
+            Debug.Log("❌ Aucun ennemi détecté dans la zone !");
             return;
         }
 
-        // Ensuite les GetComponent sécurisés
-        Enemy e = enemyInZone.GetComponent<Enemy>();
-        if (e != null)
+        Collider2D target = enemiesInZone[0];
+        Transform root = target.transform.root;
+        bool touched = false;
+
+        if (root.GetComponentInChildren<Enemy>() is Enemy e)
         {
             e.Damage(damage);
-            Debug.Log("Ennemi touché par attaque !");
-            return;
+            Debug.Log("🦴 Dégâts infligés à Enemy : " + e.name);
+            touched = true;
         }
-
-        BossHealth boss = enemyInZone.GetComponent<BossHealth>();
-        if (boss != null)
+        else if (root.GetComponentInChildren<BossHealth>() is BossHealth boss)
         {
             boss.TakeDamage(damage);
-            Debug.Log("Boss touché par attaque !");
-            return;
+            Debug.Log("💀 Dégâts infligés à Boss : " + boss.name);
+            touched = true;
         }
-
-        ExplosiveEnemy ex = enemyInZone.GetComponent<ExplosiveEnemy>();
-        if (ex != null)
+        else if (root.GetComponentInChildren<ExplosiveEnemy>() is ExplosiveEnemy ex)
         {
             ex.Damage(damage);
-            Debug.Log("Slime explosif touché !");
-            return;
+            Debug.Log("💣 Dégâts infligés à Slime Explosif : " + ex.name);
+            touched = true;
         }
-
-        FlyingEnemy fe = enemyInZone.GetComponent<FlyingEnemy>();
-        if (fe != null)
+        else if (root.GetComponentInChildren<FlyingEnemy>() is FlyingEnemy fe)
         {
             fe.Damage(damage);
-            Debug.Log("Slime Vollant touché !");
-            return;
+            Debug.Log("🪶 Dégâts infligés à Slime Volant : " + fe.name);
+            touched = true;
         }
 
-        Debug.LogWarning("⚠️ Aucun script d'ennemi trouvé sur " + enemyInZone.name);
+        if (touched)
+        {
+            hasHit = true;
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ Aucun script de dégâts trouvé sur : " + target.name);
+        }
     }
-
 }

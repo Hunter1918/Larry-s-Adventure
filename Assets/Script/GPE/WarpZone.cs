@@ -54,6 +54,12 @@ public class WarpZone : MonoBehaviour
 
         // Reactiver le joueur
         player.SetActive(true);
+        Animator animator = player.GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.Play("Idle", 0, 0f); // Force à débuter Idle à 0%
+
+        }
 
         // Revenir à la caméra principale
         transitionCam.Priority = 0;

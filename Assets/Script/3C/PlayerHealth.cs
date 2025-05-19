@@ -43,10 +43,11 @@ public class PlayerHealth : MonoBehaviour
 
         InitHearts();
 
-        if (CheckpointManager.Instance != null && CheckpointManager.Instance.GetLastCheckpointPosition() == Vector3.zero)
+        if (CheckpointManager.Instance != null && player != null && CheckpointManager.Instance.GetLastCheckpointPosition() == Vector3.zero)
         {
             CheckpointManager.Instance.SetCheckpoint(player.position);
         }
+
     }
 
     void InitHearts()
@@ -115,10 +116,23 @@ public class PlayerHealth : MonoBehaviour
         yield return StartCoroutine(FadeToBlack());
         yield return new WaitForSeconds(respawnDelay);
 
+        if (CheckpointManager.Instance == null)
+        {
+            Debug.LogWarning("❌ CheckpointManager.Instance est null !");
+            yield return StartCoroutine(FadeFromBlack());
+            yield break;
+        }
+
         Vector3 checkpointPos = CheckpointManager.Instance.GetLastCheckpointPosition();
 
         if (checkpointPos != Vector3.zero)
         {
+            if (player == null)
+            {
+                Debug.LogError("❌ Transform 'player' non assigné dans PlayerHealth !");
+                yield break;
+            }
+
             Vector3 oldPos = player.position;
             player.position = checkpointPos;
 
@@ -133,11 +147,12 @@ public class PlayerHealth : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Aucun checkpoint défini !");
+            Debug.LogWarning("⚠️ Aucun checkpoint défini !");
         }
 
         yield return StartCoroutine(FadeFromBlack());
     }
+
 
     IEnumerator FadeToBlack()
     {

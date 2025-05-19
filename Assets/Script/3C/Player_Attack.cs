@@ -17,36 +17,35 @@ public class Player_Attack : MonoBehaviour
     public GameObject projectilePrefab;
     public Transform firePoint;
     public float projectileSpeed = 10f;
+    public float projectileCooldown = 0.5f;
 
+    private float lastProjectileTime = -999f;
     private bool isAttacking = false;
+
     private PlayerHealth playerHealth;
     private SpriteRenderer sr;
-    private CharacterController characterController;
-
-    [Header("Cooldown")]
-    public float projectileCooldown = 0.5f;
-    private float lastProjectileTime = -999f;
+    private PlayerMovement playerMovement;
+    private Animator animator;
 
     void Start()
     {
         playerHealth = GetComponent<PlayerHealth>();
         sr = GetComponent<SpriteRenderer>();
-        characterController = GetComponent<CharacterController>();
+        playerMovement = GetComponent<PlayerMovement>();
+        animator = GetComponent<Animator>();
 
-        normalHitbox.SetActive(false);
-        chargedHitbox.SetActive(false);
+        if (normalHitbox != null) normalHitbox.SetActive(true);
+        if (chargedHitbox != null) chargedHitbox.SetActive(true);
     }
 
     void Update()
     {
         if (isAttacking) return;
 
-        if (Input.GetKeyDown(KeyCode.F))
-        {
+        if (Input.GetKeyDown(KeyCode.F) && playerMovement.IsGrounded)
             StartCoroutine(DoAttack(normalHitbox, normalAttackDelay, false));
-        }
 
-        if (Input.GetKeyDown(KeyCode.G))
+        if (Input.GetKeyDown(KeyCode.G) && playerMovement.IsGrounded)
         {
             float cost = Mathf.Ceil(playerHealth.maxHealth * chargedHealthCost);
             if (playerHealth.GetCurrentHealth() > cost)
@@ -61,9 +60,7 @@ public class Player_Attack : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.R))
-        {
             TryShootProjectile();
-        }
     }
 
     void TryShootProjectile()
@@ -85,10 +82,8 @@ public class Player_Attack : MonoBehaviour
 
         playerHealth.TakeDamage(cost);
         ShootProjectile();
-
         lastProjectileTime = Time.time;
     }
-
 
     void ShootProjectile()
     {
@@ -99,46 +94,61 @@ public class Player_Attack : MonoBehaviour
         }
 
         GameObject proj = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
-
-        float direction = characterController.FacingRight ? 1f : -1f;
-
+        float direction = playerMovement.FacingRight ? 1f : -1f;
 
         BoneProjectile bone = proj.GetComponent<BoneProjectile>();
         if (bone != null)
-        {
             bone.SetDirection(direction);
-        }
+    }
+    public void TriggerDamage()
+    {
+        if (normalHitbox != null && normalHitbox.TryGetComponent(out PlayerMeleeHitbox hitbox))
+            hitbox.TriggerDamage();
     }
 
     IEnumerator DoAttack(GameObject hitboxGO, float delay, bool isCharged)
     {
         isAttacking = true;
 
-        if (isCharged)
-        {
-            playerHealth.isChargingAttack = true;
-        }
+        if (animator != null)
+            animator.SetTrigger("Attack");
 
-        PlayerMeleeHitbox hitbox = hitboxGO.GetComponent<PlayerMeleeHitbox>();
-        hitbox.ShowZone();
+        if (isCharged)
+            playerHealth.isChargingAttack = true;
 
         sr.DOKill();
         Color flashColor = isCharged ? Color.red : Color.yellow;
         sr.color = flashColor;
         sr.DOColor(Color.white, 0.2f).SetEase(Ease.Linear);
 
-        yield return new WaitForSeconds(0.1f);
-
-        hitbox.EnableDamageWindow();
-        hitbox.TriggerDamage();
-        hitbox.DisableDamageWindow();
-
         yield return new WaitForSeconds(delay);
 
-        hitbox.HideZone();
         isAttacking = false;
 
         if (isCharged)
             playerHealth.isChargingAttack = false;
+    }
+
+    public bool IsAttacking() => isAttacking;
+
+    public void EndAttack() => isAttacking = false;
+
+    // Animation Events : Appellent ces fonctions pendant l'anim
+    public void EnableDamageWindow()
+    {
+        if (normalHitbox != null && normalHitbox.TryGetComponent(out PlayerMeleeHitbox hitbox))
+            hitbox.EnableDamageWindow();
+    }
+
+    public void _TriggerDamage()
+    {
+        if (normalHitbox != null && normalHitbox.TryGetComponent(out PlayerMeleeHitbox hitbox))
+            hitbox.TriggerDamage();
+    }
+
+    public void DisableDamageWindow()
+    {
+        if (normalHitbox != null && normalHitbox.TryGetComponent(out PlayerMeleeHitbox hitbox))
+            hitbox.DisableDamageWindow();
     }
 }
