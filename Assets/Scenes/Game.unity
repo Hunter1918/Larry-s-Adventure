@@ -27543,7 +27543,7 @@ MonoBehaviour:
   invincibilityDuration: 0.5
   isChargingAttack: 0
   player: {fileID: 2020468554}
-  virtualCam: {fileID: 0}
+  virtualCam: {fileID: 764799178}
   fadeImage: {fileID: 0}
   fadeDuration: 0.5
   respawnDelay: 0.5
