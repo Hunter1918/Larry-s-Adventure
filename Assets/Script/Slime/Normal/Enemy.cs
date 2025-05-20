@@ -1,9 +1,9 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
-    [Header("D�tection du joueur")]
+    [Header("Détection du joueur")]
     public LayerMask playerLayer;
     public float visionRange = 5f;
     public Vector2 raycastOffset = new Vector2(0, 0.5f);
@@ -14,6 +14,9 @@ public class Enemy : MonoBehaviour
     public Transform platformEnd;
     [SerializeField] private Vector3 destination;
     public float moveSpeed = 2f;
+
+    [Header("Préparation Attaque")]
+    public float preAttackDuration = 0.5f;
 
     [Header("Attaque")]
     public float attackCooldown = 2f;
@@ -32,22 +35,34 @@ public class Enemy : MonoBehaviour
     private Transform targetPlayer;
     private SpriteRenderer spriteRenderer;
     private Rigidbody2D rb;
+    private Animator animator;
+
     private bool canMove = true;
+    private bool isAttacking = false;
+    private bool isPlayerInRange = false;
 
     void Start()
     {
         destination = platformEnd.position;
         spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        if (canMove)
-            Patrol();
+        isPlayerInRange = CanSeePlayer();
 
-        if (CanSeePlayer() && Time.time > lastAttackTime + attackCooldown)
-            Attack();
+        if (canMove && !isAttacking)
+        {
+            Patrol();
+            animator.SetBool("isWalking", true);
+        }
+
+        if (isPlayerInRange && Time.time > lastAttackTime + attackCooldown && !isAttacking)
+        {
+            StartCoroutine(AttackSequence());
+        }
     }
 
     void Patrol()
@@ -68,7 +83,7 @@ public class Enemy : MonoBehaviour
         localScale.x *= -1f;
         transform.localScale = localScale;
     }
-    
+
     bool CanSeePlayer()
     {
         Vector2 direction = faceRight ? Vector2.right : Vector2.left;
@@ -87,23 +102,40 @@ public class Enemy : MonoBehaviour
         return false;
     }
 
-    void Attack()
+    IEnumerator AttackSequence()
     {
-        Debug.Log($"{gameObject.name} attaque le joueur !");
-        lastAttackTime = Time.time;
+        isAttacking = true;
+        canMove = false;
 
-        if (targetPlayer != null)
+        animator.SetBool("isWalking", false); // passe de Marche à Idle
+        yield return new WaitForSeconds(preAttackDuration); // animation Idle = pré attaque
+
+        animator.SetTrigger("TriggerAttack"); // enchaîne vers Attack
+        yield return new WaitForSeconds(1f); // laisse le temps à l'animation de se jouer
+
+        lastAttackTime = Time.time;
+        canMove = true;
+        isAttacking = false;
+    }
+
+    // Appelé par un Animation Event dans l’animation Attack
+    public void DealDamage()
+    {
+        if (targetPlayer != null && isPlayerInRange)
         {
             PlayerHealth playerHealth = targetPlayer.GetComponent<PlayerHealth>();
             if (playerHealth != null)
+            {
+                Debug.Log($"{gameObject.name} inflige des dégâts via animation !");
                 playerHealth.TakeDamage(damageToPlayer);
+            }
         }
     }
 
     public void Damage(int amount)
     {
         health -= amount;
-        Debug.Log($"{gameObject.name} a pris {amount} d�g�ts. Vie restante : {health}");
+        Debug.Log($"{gameObject.name} a pris {amount} dégâts. Vie restante : {health}");
 
         Vector2 knockDirection = ((Vector2)transform.position - PlayerPosition()).normalized;
         rb.AddForce(knockDirection * knockbackForce, ForceMode2D.Impulse);
@@ -120,6 +152,7 @@ public class Enemy : MonoBehaviour
         Debug.Log($"{gameObject.name} est mort !");
         Destroy(gameObject);
     }
+
     IEnumerator FlashSprite()
     {
         for (int i = 0; i < 3; i++)
