@@ -29,7 +29,10 @@ public class WarpZone : MonoBehaviour
     private IEnumerator HandleTeleportSequence()
     {
         // Désactive le joueur
-        player.SetActive(false);
+        //player.SetActive(false);
+        player.GetComponent<Rigidbody2D>().isKinematic = true;
+        player.GetComponent<Renderer>().enabled = false;
+        player.GetComponent<PlayerMovement>().enabled = false;
         yield return new WaitForSeconds(0.5f);
         // Switch sur la caméra de transition
         mainCam.Priority = 0;
@@ -53,12 +56,15 @@ public class WarpZone : MonoBehaviour
         yield return StartCoroutine(FadeIn(Level_Next));
 
         // Reactiver le joueur
-        player.SetActive(true);
+        //player.SetActive(true);
+        player.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        player.GetComponent<Rigidbody2D>().isKinematic = false;
+        player.GetComponent<Renderer>().enabled = true;
+        player.GetComponent<PlayerMovement>().enabled = true;
         Animator animator = player.GetComponent<Animator>();
         if (animator != null)
         {
             animator.Play("Idle", 0, 0f); // Force à débuter Idle à 0%
-
         }
 
         // Revenir à la caméra principale
