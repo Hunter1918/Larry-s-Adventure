@@ -72,7 +72,7 @@ public class PlayerMeleeHitbox : MonoBehaviour
             return;
         }
 
-        Collider2D target = enemiesInZone[0];
+        Collider2D target = enemiesInZone[0];  // liste ennemy coincé dans la queue pour les degats (celui en haut de la iste prends les degats de tous le monde)
         Transform root = target.transform.root;
         bool touched = false;
 
@@ -97,7 +97,7 @@ public class PlayerMeleeHitbox : MonoBehaviour
         else if (root.GetComponentInChildren<FlyingEnemy>() is FlyingEnemy fe)
         {
             fe.Damage(damage);
-            Debug.Log("🪶 Dégâts infligés à Slime Volant : " + fe.name);
+            Debug.Log("Dégâts infligés à Slime Volant : " + fe.name);
             touched = true;
         }
 

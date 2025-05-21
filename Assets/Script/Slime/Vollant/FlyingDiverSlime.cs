@@ -3,80 +3,59 @@ using UnityEngine;
 
 public class FlyingDiverSlime : MonoBehaviour
 {
-    [Header("Détection & Patrouille")]
-    public float moveSpeed = 2f;
-    public float detectionRange = 8f;
+    [Header("Patrouille")]
     public Transform pointA;
     public Transform pointB;
-    private Vector3 currentTarget;
-    private bool playerDetected = false;
+    public float moveSpeed = 2f;
 
-    [Header("Vol & Plongeon")]
-    public float hoverHeight = 3f;
+    [Header("Détection & Plongeon")]
+    public float detectionRange = 8f;
     public float diveCooldown = 6f;
     public float diveSpeed = 10f;
-    public float stunDuration = 2f;
+    public float groundPauseDuration = 1f;
+
+    [Header("Dégâts")]
     public float contactRadius = 0.5f;
     public int contactDamage = 1;
-
-    [Header("Tir")]
-    public GameObject projectilePrefab;
-    public Transform firePoint;
-    public float shootCooldown = 3f;
-    public int burstCount = 3;
-    public float burstInterval = 0.2f;
 
     [Header("Vie")]
     public int maxHealth = 10;
     private int currentHealth;
 
+    private Vector3 currentTarget;
     private Transform player;
     private Rigidbody2D rb;
     private Animator animator;
 
-    private float lastShootTime;
     private float lastDiveTime;
     private bool isDiving = false;
-    private bool isStunned = false;
+    private bool playerDetected = false;
 
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
         rb = GetComponent<Rigidbody2D>();
-        currentHealth = maxHealth;
+        animator = GetComponent<Animator>();
         currentTarget = pointA.position;
-
-        if (TryGetComponent(out Animator anim))
-            animator = anim;
+        currentHealth = maxHealth;
     }
 
     void Update()
     {
-        if (player == null || isDiving || isStunned) return;
+        if (player == null || isDiving) return;
 
-        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        float dist = Vector2.Distance(transform.position, player.position);
 
-        // Détection avec hysteresis pour éviter clignotements
-        if (distanceToPlayer <= detectionRange)
+        // Détection joueur
+        if (dist <= detectionRange)
             playerDetected = true;
-        else if (playerDetected && distanceToPlayer > detectionRange * 1.5f)
+        else if (playerDetected && dist > detectionRange * 1.5f)
             playerDetected = false;
 
-        if (playerDetected)
+        if (playerDetected && Time.time >= lastDiveTime + diveCooldown)
         {
-            HoverFollowPlayer();
-
-            if (Time.time >= lastShootTime + shootCooldown)
-            {
-                StartCoroutine(ShootBurst());
-                lastShootTime = Time.time;
-            }
-
-            if (Time.time >= lastDiveTime + diveCooldown)
-            {
-                StartCoroutine(DoDiveAttack());
-                lastDiveTime = Time.time;
-            }
+            StartCoroutine(DoDiveOnce());
+            lastDiveTime = Time.time;
         }
         else
         {
@@ -86,101 +65,67 @@ public class FlyingDiverSlime : MonoBehaviour
 
     void Patrol()
     {
-        Vector2 moveDir = (currentTarget - transform.position).normalized;
-        rb.velocity = moveDir * moveSpeed;
+        Vector2 dir = (currentTarget - transform.position).normalized;
+        rb.velocity = dir * moveSpeed;
 
         if (Vector2.Distance(transform.position, currentTarget) < 0.2f)
-        {
             currentTarget = (currentTarget == pointA.position) ? pointB.position : pointA.position;
-        }
 
         if (animator) animator.SetBool("IsFlying", true);
     }
 
-    void HoverFollowPlayer()
-    {
-        Vector2 targetPos = new Vector2(player.position.x, player.position.y + hoverHeight);
-        Vector2 moveDir = (targetPos - (Vector2)transform.position).normalized;
-        rb.velocity = moveDir * moveSpeed;
-
-        if (animator) animator.SetBool("IsFlying", true);
-    }
-
-    IEnumerator ShootBurst()
-    {
-        for (int i = 0; i < burstCount; i++)
-        {
-            Vector2 direction = (player.position - firePoint.position).normalized;
-            float angleOffset = (i - (burstCount - 1) / 2f) * 10f;
-            Quaternion rotation = Quaternion.Euler(0, 0, angleOffset);
-            Vector2 spreadDir = rotation * direction;
-
-            GameObject proj = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
-            proj.GetComponent<Projectile>().SetDirection(spreadDir);
-
-            yield return new WaitForSeconds(burstInterval);
-        }
-    }
-
-    IEnumerator DoDiveAttack()
+    IEnumerator DoDiveOnce()
     {
         isDiving = true;
-        rb.velocity = Vector2.zero;
-        if (animator) animator.SetTrigger("Dive");
+        Debug.Log("🧨 Début du dive !");
 
-        Vector2 diveDirection = (player.position - transform.position).normalized;
-        rb.velocity = diveDirection * diveSpeed;
-
-        float timer = 0f;
-        float maxTime = 1.5f;
-
-        while (!IsGrounded() && timer < maxTime)
+        if (animator != null)
         {
-            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, contactRadius);
-            foreach (var hit in hits)
-            {
-                if (hit.CompareTag("Player"))
-                {
-                    PlayerHealth ph = hit.GetComponent<PlayerHealth>();
-                    if (ph != null)
-                    {
-                        ph.TakeDamage(contactDamage);
-                        Debug.Log("💥 Le slime a touché le joueur en fonçant !");
-                    }
-                    break;
-                }
-            }
-
-            timer += Time.deltaTime;
-            yield return null;
+            animator.ResetTrigger("Fall"); // Sécurité
+            animator.SetTrigger("Fall");
+            animator.SetBool("IsFlying", false);
+            Debug.Log("🎬 Trigger 'Fall' envoyé !");
         }
 
+        rb.velocity = Vector2.down * diveSpeed;
+
+        yield return new WaitUntil(() => IsGrounded());
         rb.velocity = Vector2.zero;
+
+        Debug.Log("🛬 Slime au sol, pause 1s...");
+        yield return new WaitForSeconds(groundPauseDuration);
+
         isDiving = false;
-        isStunned = true;
-        if (animator) animator.SetBool("IsFlying", false);
-
-        yield return new WaitForSeconds(stunDuration);
-
-        isStunned = false;
         if (animator) animator.SetBool("IsFlying", true);
+        Debug.Log("🔄 Slime reprend la patrouille !");
     }
 
     bool IsGrounded()
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.1f);
-        return hit.collider != null;
+        return Physics2D.Raycast(transform.position, Vector2.down, 0.1f);
+    }
+
+    void OnCollisionEnter2D(Collision2D col)
+    {
+        if (col.collider.CompareTag("Player"))
+        {
+            var ph = col.collider.GetComponent<PlayerHealth>();
+            if (ph != null)
+            {
+                ph.TakeDamage(contactDamage);
+                Debug.Log("💥 Dégâts au joueur par contact !");
+            }
+        }
     }
 
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
-        Debug.Log("🩸 Slime volant prend " + amount + " dégâts (restant : " + currentHealth + ")");
+        Debug.Log("🩸 Slime prend " + amount + " dégâts (PV restants : " + currentHealth + ")");
         StartCoroutine(FlashSprite());
+
         if (currentHealth <= 0)
-        {
             Die();
-        }
     }
 
     IEnumerator FlashSprite()
@@ -188,33 +133,19 @@ public class FlyingDiverSlime : MonoBehaviour
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         if (sr != null)
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 2; i++)
             {
                 sr.color = new Color(1, 1, 1, 0.3f);
                 yield return new WaitForSeconds(0.1f);
                 sr.color = Color.white;
                 yield return new WaitForSeconds(0.1f);
-                sr.color = Color.red;
             }
         }
     }
 
     void Die()
     {
-        Debug.Log("💀 Slime volant mort !");
+        Debug.Log("💀 Slime éliminé !");
         Destroy(gameObject);
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.collider.CompareTag("Player"))
-        {
-            PlayerHealth ph = collision.collider.GetComponent<PlayerHealth>();
-            if (ph != null)
-            {
-                ph.TakeDamage(contactDamage);
-                Debug.Log("⚡ Le slime a infligé des dégâts au joueur par contact !");
-            }
-        }
     }
 }

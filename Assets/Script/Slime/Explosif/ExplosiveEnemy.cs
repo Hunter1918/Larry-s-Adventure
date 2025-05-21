@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ExplosiveEnemy : MonoBehaviour
 {
@@ -7,18 +7,15 @@ public class ExplosiveEnemy : MonoBehaviour
     void Awake()
     {
         slime = GetComponent<ExplosiveSlime>();
+        if (slime == null)
+            Debug.LogError("❌ Aucun script ExplosiveSlime trouvé sur " + gameObject.name);
     }
 
     public void Damage(int amount)
     {
-        Debug.Log("ExplosiveEnemy: Damage re�u : " + amount);
         if (slime != null)
-        {
             slime.TakeDamage(amount);
-        }
         else
-        {
-            Debug.LogWarning("slime (ExplosiveSlime) est null !");
-        }
+            Debug.LogWarning("⚠️ Impossible d'infliger des dégâts : slime manquant");
     }
 }

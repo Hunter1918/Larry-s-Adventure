@@ -1,44 +1,54 @@
-﻿using DG.Tweening;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Explosion : MonoBehaviour
 {
     public float radius = 2f;
-    public int damage = 10;
+    public int damage = 1;
     public float duration = 0.5f;
-
-    public SpriteRenderer flashRenderer;
-    public Color flashColor = Color.yellow;
-    public float flashTime = 0.15f;
 
     void Start()
     {
-        Debug.Log("💥 Explosion stylée déclenchée !");
-        if (flashRenderer != null)
+        Debug.Log("💥 Explosion instanciée à " + transform.position);
+        Debug.Log("🔍 Rayon utilisé pour détection : " + radius);
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius);
+
+        if (hits.Length == 0)
         {
-            flashRenderer.color = new Color(flashColor.r, flashColor.g, flashColor.b, 0f);
-            flashRenderer.DOFade(0.8f, flashTime).SetLoops(2, LoopType.Yoyo);
+            Debug.Log("❌ Aucun objet détecté dans la zone !");
         }
 
-        Camera.main.transform.DOShakePosition(0.3f, 0.6f, 20, 90);
-
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
+        foreach (Collider2D hit in hits)
         {
-            float dist = Vector2.Distance(transform.position, player.transform.position);
-            Debug.Log("📏 Distance joueur : " + dist);
+            Debug.Log("🧪 Objet détecté : " + hit.name);
 
-            if (dist <= radius)
+            if (hit.CompareTag("Player"))
             {
-                PlayerHealth ph = player.GetComponent<PlayerHealth>();
+                Debug.Log("🎯 Le joueur est bien tagué 'Player'");
+
+                PlayerHealth ph = hit.GetComponent<PlayerHealth>();
                 if (ph != null)
                 {
+                    Debug.Log("🔥 PlayerHealth trouvé, dégâts infligés !");
                     ph.TakeDamage(damage);
-                    Debug.Log("🔥 Joueur touché !");
                 }
+                else
+                {
+                    Debug.LogWarning("⚠️ Player détecté mais aucun script 'PlayerHealth' trouvé sur " + hit.name);
+                }
+            }
+            else
+            {
+                Debug.Log("🔸 Objet non joueur détecté : " + hit.name + " (tag : " + hit.tag + ")");
             }
         }
 
         Destroy(gameObject, duration);
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, radius);
     }
 }

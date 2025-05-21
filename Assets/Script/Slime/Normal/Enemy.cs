@@ -56,7 +56,6 @@ public class Enemy : MonoBehaviour
         if (canMove && !isAttacking)
         {
             Patrol();
-            animator.SetBool("isWalking", true);
         }
 
         if (isPlayerInRange && Time.time > lastAttackTime + attackCooldown && !isAttacking)
@@ -67,6 +66,8 @@ public class Enemy : MonoBehaviour
 
     void Patrol()
     {
+        animator.SetBool("isWalking", true);
+
         transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
 
         if (Vector3.Distance(transform.position, destination) < 0.1f)
