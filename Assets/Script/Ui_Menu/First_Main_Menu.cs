@@ -47,6 +47,34 @@ public class First_Main_Menu : MonoBehaviour
         yield return new WaitForSeconds(4f); // adapte aussi
 
         Debug.Log("✅ Affichage du menu");
+        yield return StartCoroutine(FadeInCanvas(CanvaMenu, 1f));
         CanvaMenu.SetActive(true);
     }
+    IEnumerator FadeInCanvas(GameObject target, float duration)
+    {
+        target.SetActive(true);
+
+        CanvasGroup cg = target.GetComponent<CanvasGroup>();
+        if (cg == null)
+        {
+            cg = target.AddComponent<CanvasGroup>();
+        }
+
+        cg.alpha = 0f;
+        cg.interactable = false;
+        cg.blocksRaycasts = false;
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            cg.alpha = Mathf.Clamp01(elapsed / duration);
+            yield return null;
+        }
+
+        cg.alpha = 1f;
+        cg.interactable = true;
+        cg.blocksRaycasts = true;
+    }
+
 }

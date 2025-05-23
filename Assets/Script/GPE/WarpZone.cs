@@ -31,8 +31,10 @@ public class WarpZone : MonoBehaviour
         // Désactive le joueur
         //player.SetActive(false);
         player.GetComponent<Rigidbody2D>().isKinematic = true;
+        player.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
         player.GetComponent<Renderer>().enabled = false;
         player.GetComponent<PlayerMovement>().enabled = false;
+
         yield return new WaitForSeconds(0.5f);
         // Switch sur la caméra de transition
         mainCam.Priority = 0;
@@ -54,13 +56,14 @@ public class WarpZone : MonoBehaviour
 
         // Fade in du nouveau niveau
         yield return StartCoroutine(FadeIn(Level_Next));
-
         // Reactiver le joueur
         //player.SetActive(true);
         player.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         player.GetComponent<Rigidbody2D>().isKinematic = false;
+        player.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
         player.GetComponent<Renderer>().enabled = true;
         player.GetComponent<PlayerMovement>().enabled = true;
+
         Animator animator = player.GetComponent<Animator>();
         if (animator != null)
         {
@@ -104,7 +107,6 @@ public class WarpZone : MonoBehaviour
             }
         }
     }
-
 
     private IEnumerator FadeIn(GameObject obj)
     {

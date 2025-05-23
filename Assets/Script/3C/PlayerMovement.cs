@@ -55,8 +55,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void CheckGround()
     {
-        Vector2 leftRayOrigin = new Vector2(transform.position.x - 0.57f, transform.position.y - 0.6f);
-        Vector2 rightRayOrigin = new Vector2(transform.position.x + 0.57f, transform.position.y - 0.6f);
+        Vector2 leftRayOrigin = new Vector2(transform.position.x - 0.9f, transform.position.y - 0.9f);
+        Vector2 rightRayOrigin = new Vector2(transform.position.x + 0.1f, transform.position.y - 0.9f);
 
         RaycastHit2D leftHit = Physics2D.Raycast(leftRayOrigin, Vector2.down, groundCheckDistance, groundLayer);
         RaycastHit2D rightHit = Physics2D.Raycast(rightRayOrigin, Vector2.down, groundCheckDistance, groundLayer);

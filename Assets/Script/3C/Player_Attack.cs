@@ -117,9 +117,9 @@ public class Player_Attack : MonoBehaviour
             playerHealth.isChargingAttack = true;
 
         sr.DOKill();
-        Color flashColor = isCharged ? Color.red : Color.yellow;
-        sr.color = flashColor;
-        sr.DOColor(Color.white, 0.2f).SetEase(Ease.Linear);
+        //Color flashColor = isCharged ? Color.red : Color.yellow;
+        //sr.color = flashColor;
+        //sr.DOColor(Color.white, 0.2f).SetEase(Ease.Linear);
 
         yield return new WaitForSeconds(delay);
 

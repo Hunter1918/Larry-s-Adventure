@@ -58,8 +58,6 @@ public class PlayerMeleeHitbox : MonoBehaviour
     {
         Debug.Log("✅ TriggerDamage lancé par Animation Event !");
 
-        Debug.Log("⚡ TriggerDamage appelé");
-
         if (!canDealDamage || hasHit)
         {
             Debug.Log("⛔️ Pas autorisé à infliger des dégâts.");
@@ -72,42 +70,48 @@ public class PlayerMeleeHitbox : MonoBehaviour
             return;
         }
 
-        Collider2D target = enemiesInZone[0];  // liste ennemy coincé dans la queue pour les degats (celui en haut de la iste prends les degats de tous le monde)
-        Transform root = target.transform.root;
-        bool touched = false;
+        bool anyHit = false;
 
-        if (root.GetComponentInChildren<Enemy>() is Enemy e)
+        var enemiesToDamage = new List<Collider2D>(enemiesInZone); // ✅ copie locale
+
+        foreach (Collider2D target in enemiesToDamage)
         {
-            e.Damage(damage);
-            Debug.Log("🦴 Dégâts infligés à Enemy : " + e.name);
-            touched = true;
-        }
-        else if (root.GetComponentInChildren<BossHealth>() is BossHealth boss)
-        {
-            boss.TakeDamage(damage);
-            Debug.Log("💀 Dégâts infligés à Boss : " + boss.name);
-            touched = true;
-        }
-        else if (root.GetComponentInChildren<ExplosiveEnemy>() is ExplosiveEnemy ex)
-        {
-            ex.Damage(damage);
-            Debug.Log("💣 Dégâts infligés à Slime Explosif : " + ex.name);
-            touched = true;
-        }
-        else if (root.GetComponentInChildren<FlyingEnemy>() is FlyingEnemy fe)
-        {
-            fe.Damage(damage);
-            Debug.Log("Dégâts infligés à Slime Volant : " + fe.name);
-            touched = true;
+            if (target == null) continue;
+
+            // On cible le bon GameObject avec le bon script sans remonter au root
+            if (target.TryGetComponent<Enemy>(out var e))
+            {
+                e.Damage(damage);
+                Debug.Log("🦴 Dégâts infligés à Enemy : " + e.name);
+                anyHit = true;
+            }
+            else if (target.TryGetComponent<BossHealth>(out var boss))
+            {
+                boss.TakeDamage(damage);
+                Debug.Log("💀 Dégâts infligés à Boss : " + boss.name);
+                anyHit = true;
+            }
+            else if (target.TryGetComponent<ExplosiveEnemy>(out var ex))
+            {
+                ex.Damage(damage);
+                Debug.Log("💣 Dégâts infligés à Slime Explosif : " + ex.name);
+                anyHit = true;
+            }
+            else if (target.TryGetComponent<FlyingEnemy>(out var fe))
+            {
+                fe.Damage(damage);
+                Debug.Log("🪶 Dégâts infligés à Slime Volant : " + fe.name);
+                anyHit = true;
+            }
+            else
+            {
+                Debug.LogWarning("⚠️ Aucun script de dégâts trouvé sur : " + target.name);
+            }
         }
 
-        if (touched)
-        {
+        if (anyHit)
             hasHit = true;
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ Aucun script de dégâts trouvé sur : " + target.name);
-        }
     }
+
+
 }
