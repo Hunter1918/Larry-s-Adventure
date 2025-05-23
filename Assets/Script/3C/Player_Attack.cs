@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 using DG.Tweening;
 
@@ -55,7 +55,7 @@ public class Player_Attack : MonoBehaviour
             }
             else
             {
-                Debug.Log("Pas assez de vie pour attaque chargée !");
+                Debug.Log("Pas assez de vie pour attaque chargÃ©e !");
             }
         }
 
@@ -67,7 +67,7 @@ public class Player_Attack : MonoBehaviour
     {
         if (Time.time < lastProjectileTime + projectileCooldown)
         {
-            Debug.Log("Attaque à distance en cooldown !");
+            Debug.Log("Attaque Ã  distance en cooldown !");
             return;
         }
 
@@ -89,7 +89,7 @@ public class Player_Attack : MonoBehaviour
     {
         if (projectilePrefab == null || firePoint == null)
         {
-            Debug.LogWarning("Projectile prefab ou firePoint non assigné !");
+            Debug.LogWarning("Projectile prefab ou firePoint non assignÃ© !");
             return;
         }
 

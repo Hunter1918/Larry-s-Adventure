@@ -41,13 +41,18 @@ public class Enemy : MonoBehaviour
     private bool isAttacking = false;
     private bool isPlayerInRange = false;
 
-    void Start()
+    void Awake()
     {
-        destination = platformEnd.position;
         spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
     }
+
+    void Start()
+    {
+        destination = platformEnd.position;
+    }
+
 
     void Update()
     {

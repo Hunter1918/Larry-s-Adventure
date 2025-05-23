@@ -142,6 +142,7 @@ public class SplitPageDialogueManager : MonoBehaviour
 
         if (texteActuel.Contains(phraseDeclencheur))
         {
+            //yield return new WaitForSeconds(5f);
             choixUI.SetActive(true);
             isWaitingForNext = false; // on bloque la suite ici
         }

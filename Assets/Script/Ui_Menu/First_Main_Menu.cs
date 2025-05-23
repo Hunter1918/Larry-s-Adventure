@@ -3,28 +3,43 @@ using UnityEngine;
 
 public class First_Main_Menu : MonoBehaviour
 {
-    public GameObject CanvaIntro;   // Le Canvas d’intro ("Appuyez sur une touche")
-    public GameObject CanvaMenu;    // Le Canvas du menu principal final
+    public GameObject CanvaLogo416; // 💡 Nouveau : Logo studio 416
+    public GameObject CanvaIntro;
+    public GameObject CanvaMenu;
 
-    public Animator cameraAnimator; // Animator de la caméra
-    public Animator bookAnimator;   // Animator du livre
+    public Animator cameraAnimator;
+    public Animator bookAnimator;
 
     private bool hasStarted = false;
 
     void Start()
     {
         Time.timeScale = 1f;
-        CanvaIntro.SetActive(true);
+
+        CanvaLogo416.SetActive(true);
+        CanvaIntro.SetActive(false);
         CanvaMenu.SetActive(false);
 
-        // Reset sécurité (au cas où les bool restent bloqués d’un ancien play)
         cameraAnimator.SetBool("StartCam", false);
         bookAnimator.SetBool("StartAnim", false);
+
+        StartCoroutine(LogoThenIntro());
+    }
+
+    IEnumerator LogoThenIntro()
+    {
+        yield return StartCoroutine(FadeInCanvas(CanvaLogo416, 1f));
+        yield return new WaitForSeconds(2f); // Durée d’affichage du logo
+
+        yield return StartCoroutine(FadeOutCanvas(CanvaLogo416, 1f));
+        CanvaLogo416.SetActive(false);
+
+        CanvaIntro.SetActive(true);
     }
 
     void Update()
     {
-        if (!hasStarted && Input.anyKeyDown)
+        if (!hasStarted && Input.anyKeyDown && CanvaIntro.activeSelf)
         {
             hasStarted = true;
             StartCoroutine(PlaySequence());
@@ -33,32 +48,25 @@ public class First_Main_Menu : MonoBehaviour
 
     IEnumerator PlaySequence()
     {
-        Debug.Log("➡️ Fermeture du canvas d'intro");
         CanvaIntro.SetActive(false);
-
-        Debug.Log("🎥 Lancement anim caméra");
         cameraAnimator.SetBool("StartCam", true);
-        yield return new WaitForSeconds(4f); // adapte la durée si nécessaire
+        yield return new WaitForSeconds(4f);
 
-        Debug.Log("📖 Lancement anim livre");
-        yield return new WaitForSeconds(0.1f); // avant de faire SetBool
+        yield return new WaitForSeconds(0.1f);
         bookAnimator.SetBool("StartAnim", true);
+        yield return new WaitForSeconds(4f);
 
-        yield return new WaitForSeconds(4f); // adapte aussi
-
-        Debug.Log("✅ Affichage du menu");
         yield return StartCoroutine(FadeInCanvas(CanvaMenu, 1f));
         CanvaMenu.SetActive(true);
     }
+
     IEnumerator FadeInCanvas(GameObject target, float duration)
     {
         target.SetActive(true);
 
         CanvasGroup cg = target.GetComponent<CanvasGroup>();
         if (cg == null)
-        {
             cg = target.AddComponent<CanvasGroup>();
-        }
 
         cg.alpha = 0f;
         cg.interactable = false;
@@ -77,4 +85,25 @@ public class First_Main_Menu : MonoBehaviour
         cg.blocksRaycasts = true;
     }
 
+    IEnumerator FadeOutCanvas(GameObject target, float duration)
+    {
+        CanvasGroup cg = target.GetComponent<CanvasGroup>();
+        if (cg == null)
+            cg = target.AddComponent<CanvasGroup>();
+
+        cg.alpha = 1f;
+        cg.interactable = false;
+        cg.blocksRaycasts = false;
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            cg.alpha = 1f - Mathf.Clamp01(elapsed / duration);
+            yield return null;
+        }
+
+        cg.alpha = 0f;
+        target.SetActive(false);
+    }
 }
