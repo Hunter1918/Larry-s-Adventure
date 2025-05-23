@@ -3268,14 +3268,14 @@ MonoBehaviour:
     rightText: 'Un beau jour ou le ciel semblait annoncer un funeste destin une adorable
       invasion de slimes arriva.
 
-      Le royaume tout entier se retrouva face
-      a des centaines de slimes haut comme trois pommes.
+      Le royaume tout entier se retrouva face a
+      des centaines de slimes haut comme trois pommes.
 
-      Les habitants ne
-      s''achant pas se battre larry deva tous se les farcir.
+      Les habitants ne s''achant
+      pas se battre larry deva tous se les farcir.
 
-      Ces slimes etant
-      aussi puissant que vous qui lisez ce livre, alors Larry pris le temps de prendre
+      Ces slimes etant aussi
+      puissant que vous qui lisez ce livre, alors Larry pris le temps de prendre
       plusieurs pose.
 
       Pendant approximativement un mois, les slimes essayer
@@ -3299,7 +3299,7 @@ MonoBehaviour:
     leftCamTarget: {fileID: 728557750}
     rightCamTarget: {fileID: 1465048979}
     objectsToActivate: []
-  typingSpeed: 0.05
+  typingSpeed: 0.08
   virtualCam: {fileID: 1620575149}
   cameraMoveSpeed: 3
   mainCamera: {fileID: 458642985}

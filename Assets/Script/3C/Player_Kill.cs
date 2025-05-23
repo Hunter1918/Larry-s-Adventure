@@ -18,6 +18,7 @@ public class Player_Kill : MonoBehaviour
         {
             StartCoroutine(RespawnPlayer());
         }
+        Destroy(other.gameObject);
     }
 
     IEnumerator RespawnPlayer()

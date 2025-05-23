@@ -42,6 +42,7 @@ public class SplitPageDialogueManager : MonoBehaviour
     [Header("Choix du pacte")]
     public GameObject choixUI; // UI avec les boutons Oui / Non
     public string phraseDeclencheur = "Il lui fit une offre : en echange de son ame";
+    private bool attenteChoix = false;
 
 
     void Start()
@@ -70,12 +71,17 @@ public class SplitPageDialogueManager : MonoBehaviour
 
     }
 
-
-
-
-
     void Update()
     {
+        // Si on attend une confirmation pour afficher le choix
+        if (attenteChoix && Input.GetKeyDown(KeyCode.Space))
+        {
+            choixUI.SetActive(true);
+            attenteChoix = false;
+            return;
+        }
+
+        // Contrôle standard du dialogue
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Z))
         {
             if (isTyping)
@@ -139,18 +145,15 @@ public class SplitPageDialogueManager : MonoBehaviour
         isTyping = false;
 
         string texteActuel = (onLeft ? pages[currentPageIndex].leftText : pages[currentPageIndex].rightText);
-
         if (texteActuel.Contains(phraseDeclencheur))
         {
-            //yield return new WaitForSeconds(5f);
-            choixUI.SetActive(true);
-            isWaitingForNext = false; // on bloque la suite ici
+            attenteChoix = true;
+            isWaitingForNext = false;
         }
         else
         {
             isWaitingForNext = true;
         }
-
     }
 
     void SkipTyping()
@@ -173,7 +176,7 @@ public class SplitPageDialogueManager : MonoBehaviour
         string texteActuel = (onLeft ? pages[currentPageIndex].leftText : pages[currentPageIndex].rightText);
         if (texteActuel.Contains(phraseDeclencheur))
         {
-            choixUI.SetActive(true);
+            attenteChoix = true;
             isWaitingForNext = false;
         }
         else
