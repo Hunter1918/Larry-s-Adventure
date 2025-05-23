@@ -423,7 +423,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!95 &8795572
 Animator:
   serializedVersion: 5
@@ -30123,8 +30123,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 955d4633c71d31241a5fcd774694cc83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Canva1: {fileID: 1051466517}
-  Canva2: {fileID: 1034445343}
 --- !u!1 &1759908782
 GameObject:
   m_ObjectHideFlags: 0
@@ -34281,6 +34279,8 @@ MonoBehaviour:
   firePoint: {fileID: 1954783419}
   projectileSpeed: 10
   projectileCooldown: 0.5
+  normalController: {fileID: 0}
+  rareController: {fileID: 0}
 --- !u!82 &2020468557
 AudioSource:
   m_ObjectHideFlags: 0
@@ -34412,6 +34412,9 @@ MonoBehaviour:
   fadeImage: {fileID: 0}
   fadeDuration: 0.5
   respawnDelay: 0.5
+  isInRareMode: 0
+  normalController: {fileID: 0}
+  rareController: {fileID: 0}
 --- !u!114 &2020468559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36543,6 +36546,16 @@ PrefabInstance:
       propertyPath: chargedHitbox
       value: 
       objectReference: {fileID: 816933183}
+    - target: {fileID: 1525381178964957210, guid: 9af34ba14dd2e56428cd02b6e9675b53,
+        type: 3}
+      propertyPath: rareController
+      value: 
+      objectReference: {fileID: 9100000, guid: 9690791581a67814486a6fdf5bfc1732, type: 2}
+    - target: {fileID: 1525381178964957210, guid: 9af34ba14dd2e56428cd02b6e9675b53,
+        type: 3}
+      propertyPath: normalController
+      value: 
+      objectReference: {fileID: 9100000, guid: 82b3df62365bb64479e7fe5a71eef1bd, type: 2}
     - target: {fileID: 2017949344566154694, guid: 9af34ba14dd2e56428cd02b6e9675b53,
         type: 3}
       propertyPath: m_Layer
@@ -36576,7 +36589,7 @@ PrefabInstance:
     - target: {fileID: 4674896234382168239, guid: 9af34ba14dd2e56428cd02b6e9675b53,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4803191722666387357, guid: 9af34ba14dd2e56428cd02b6e9675b53,
         type: 3}
@@ -36687,7 +36700,7 @@ PrefabInstance:
         type: 3}
       propertyPath: virtualCam
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 764799178}
     - target: {fileID: 9092471882506597704, guid: 9af34ba14dd2e56428cd02b6e9675b53,
         type: 3}
       propertyPath: heartContainer
