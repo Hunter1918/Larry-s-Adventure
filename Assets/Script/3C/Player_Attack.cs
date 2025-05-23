@@ -22,10 +22,17 @@ public class Player_Attack : MonoBehaviour
     private float lastProjectileTime = -999f;
     private bool isAttacking = false;
 
+    private bool hasSwitchedToRare = false;
+
+    [Header("Animator Controller")]
+    public RuntimeAnimatorController normalController;
+    public RuntimeAnimatorController rareController;
+
+    private Animator animator;
     private PlayerHealth playerHealth;
     private SpriteRenderer sr;
     private PlayerMovement playerMovement;
-    private Animator animator;
+
 
     void Start()
     {
@@ -110,17 +117,25 @@ public class Player_Attack : MonoBehaviour
     {
         isAttacking = true;
 
-        if (animator != null)
-            animator.SetTrigger("Attack");
+        // 🎲 1 chance sur 416
+        bool rareTrigger = Random.Range(1, 2) == 1;
+
+        if (rareTrigger && !hasSwitchedToRare)
+        {
+            Debug.Log("🔥 MODE 416 ACTIVÉ !");
+            animator.runtimeAnimatorController = rareController;
+            hasSwitchedToRare = true;
+
+            if (playerHealth != null)
+                playerHealth.isInRareMode = true;
+        }
+
+        animator.SetTrigger("Attack"); // Même nom de trigger dans les 2 controllers
 
         if (isCharged)
             playerHealth.isChargingAttack = true;
 
         sr.DOKill();
-        //Color flashColor = isCharged ? Color.red : Color.yellow;
-        //sr.color = flashColor;
-        //sr.DOColor(Color.white, 0.2f).SetEase(Ease.Linear);
-
         yield return new WaitForSeconds(delay);
 
         isAttacking = false;
@@ -128,6 +143,7 @@ public class Player_Attack : MonoBehaviour
         if (isCharged)
             playerHealth.isChargingAttack = false;
     }
+
 
     public bool IsAttacking() => isAttacking;
 

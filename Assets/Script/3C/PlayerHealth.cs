@@ -34,12 +34,20 @@ public class PlayerHealth : MonoBehaviour
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
+    [HideInInspector] public bool isInRareMode = false;
+
+    [Header("Animator Controllers")]
+    public RuntimeAnimatorController normalController;
+    public RuntimeAnimatorController rareController;
+    private Animator animator;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         currentHealth = maxHealth;
+        animator = GetComponent<Animator>();
+
 
         InitHearts();
 
@@ -113,6 +121,7 @@ public class PlayerHealth : MonoBehaviour
 
     IEnumerator RespawnPlayer()
     {
+
         yield return StartCoroutine(FadeToBlack());
         yield return new WaitForSeconds(respawnDelay);
 
@@ -151,6 +160,11 @@ public class PlayerHealth : MonoBehaviour
         }
 
         yield return StartCoroutine(FadeFromBlack());
+        if (animator != null)
+        {
+            animator.runtimeAnimatorController = isInRareMode ? rareController : normalController;
+        }
+
     }
 
 
