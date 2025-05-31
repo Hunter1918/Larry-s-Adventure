@@ -6,6 +6,7 @@ public class First_Main_Menu : MonoBehaviour
     public GameObject CanvaLogo416; // 💡 Nouveau : Logo studio 416
     public GameObject CanvaIntro;
     public GameObject CanvaMenu;
+    public GameObject CanvaBlackFond;
 
     public Animator cameraAnimator;
     public Animator bookAnimator;
@@ -33,7 +34,7 @@ public class First_Main_Menu : MonoBehaviour
 
         yield return StartCoroutine(FadeOutCanvas(CanvaLogo416, 1f));
         CanvaLogo416.SetActive(false);
-
+        CanvaBlackFond.SetActive(false);
         CanvaIntro.SetActive(true);
     }
 
